@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		CB158C23E59C8D14CD41912A /* Pods_InstagramFirebase.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A28D79547E3A3F8351F85E64 /* Pods_InstagramFirebase.framework */; };
+		E40ED2D02172ABC400D2C978 /* MainTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E40ED2CF2172ABC400D2C978 /* MainTabBarController.swift */; };
+		E40ED2D22172AD9100D2C978 /* UserProfileController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E40ED2D12172AD9100D2C978 /* UserProfileController.swift */; };
+		E40ED2D52172FD9D00D2C978 /* UserProfileHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = E40ED2D42172FD9D00D2C978 /* UserProfileHeader.swift */; };
 		E4929341216B16160040893E /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4929340216B16160040893E /* Extensions.swift */; };
 		E4929343216B2DDD0040893E /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = E4929342216B2DDD0040893E /* GoogleService-Info.plist */; };
 		E4E099D7216AB60900EE8735 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E099D6216AB60900EE8735 /* AppDelegate.swift */; };
@@ -21,6 +24,9 @@
 		1E1E8260592799E46855E687 /* Pods-InstagramFirebase.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-InstagramFirebase.release.xcconfig"; path = "Pods/Target Support Files/Pods-InstagramFirebase/Pods-InstagramFirebase.release.xcconfig"; sourceTree = "<group>"; };
 		501DBCBE31B28055BAC5A59E /* Pods-InstagramFirebase.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-InstagramFirebase.debug.xcconfig"; path = "Pods/Target Support Files/Pods-InstagramFirebase/Pods-InstagramFirebase.debug.xcconfig"; sourceTree = "<group>"; };
 		A28D79547E3A3F8351F85E64 /* Pods_InstagramFirebase.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_InstagramFirebase.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		E40ED2CF2172ABC400D2C978 /* MainTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabBarController.swift; sourceTree = "<group>"; };
+		E40ED2D12172AD9100D2C978 /* UserProfileController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfileController.swift; sourceTree = "<group>"; };
+		E40ED2D42172FD9D00D2C978 /* UserProfileHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfileHeader.swift; sourceTree = "<group>"; };
 		E4929340216B16160040893E /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		E4929342216B2DDD0040893E /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		E4E099D3216AB60900EE8735 /* InstagramFirebase.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = InstagramFirebase.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -61,6 +67,15 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		E40ED2D32172FD4300D2C978 /* UserProfile */ = {
+			isa = PBXGroup;
+			children = (
+				E40ED2D12172AD9100D2C978 /* UserProfileController.swift */,
+				E40ED2D42172FD9D00D2C978 /* UserProfileHeader.swift */,
+			);
+			path = UserProfile;
+			sourceTree = "<group>";
+		};
 		E492933D216B15AF0040893E /* Utils */ = {
 			isa = PBXGroup;
 			children = (
@@ -90,8 +105,10 @@
 		E4E099D5216AB60900EE8735 /* InstagramFirebase */ = {
 			isa = PBXGroup;
 			children = (
+				E40ED2D32172FD4300D2C978 /* UserProfile */,
 				E492933D216B15AF0040893E /* Utils */,
 				E4E099D6216AB60900EE8735 /* AppDelegate.swift */,
+				E40ED2CF2172ABC400D2C978 /* MainTabBarController.swift */,
 				E4E099D8216AB60900EE8735 /* ViewController.swift */,
 				E4E099DA216AB60900EE8735 /* Main.storyboard */,
 				E4E099DD216AB60E00EE8735 /* Assets.xcassets */,
@@ -200,12 +217,14 @@
 				"${BUILT_PRODUCTS_DIR}/GTMSessionFetcher/GTMSessionFetcher.framework",
 				"${BUILT_PRODUCTS_DIR}/GoogleUtilities/GoogleUtilities.framework",
 				"${BUILT_PRODUCTS_DIR}/leveldb-library/leveldb.framework",
+				"${BUILT_PRODUCTS_DIR}/nanopb/nanopb.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMSessionFetcher.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleUtilities.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/leveldb.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/nanopb.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -221,6 +240,9 @@
 			files = (
 				E4E099D9216AB60900EE8735 /* ViewController.swift in Sources */,
 				E4929341216B16160040893E /* Extensions.swift in Sources */,
+				E40ED2D02172ABC400D2C978 /* MainTabBarController.swift in Sources */,
+				E40ED2D52172FD9D00D2C978 /* UserProfileHeader.swift in Sources */,
+				E40ED2D22172AD9100D2C978 /* UserProfileController.swift in Sources */,
 				E4E099D7216AB60900EE8735 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
