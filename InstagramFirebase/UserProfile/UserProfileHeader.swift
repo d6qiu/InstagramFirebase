@@ -54,7 +54,7 @@ class UserProfileHeader: UICollectionViewCell{
     //MARK: - User stats view variables
     let postLabel: UILabel = {
        let label = UILabel()
-        
+        //NSAtttributedString is the string, .key are the attributes
         let attributedText = NSMutableAttributedString(string: "11\n", attributes: [NSAttributedString.Key.font : UIFont.boldSystemFont(ofSize: 14)])
         
         attributedText.append(NSAttributedString(string: "posts", attributes: [NSAttributedString.Key.foregroundColor: UIColor.lightGray, NSAttributedString.Key.font
@@ -112,14 +112,13 @@ class UserProfileHeader: UICollectionViewCell{
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-
-        //add to subview before anchor
+        //add to subview before anchor, else there's nothing to anchor
         addSubview(profileImageView)
         //topAnchor equivalent to self.topAnchor, top left corner
         profileImageView.anchor(top: topAnchor, left: leftAnchor, bottom: nil, right: nil, paddingTop: 12, paddingLeft: 12, paddingBottom: 0, paddingRight: 0, width: 80, height: 80)
         profileImageView.layer.cornerRadius = 80 / 2
-        profileImageView.clipsToBounds = true
-        
+        profileImageView.clipsToBounds = true //does same thing as layer.maskSToBounds, image is the subview of UIimageView?
+        //profileImageView.layer.masksToBounds = true
         setupBottomToolbar()
         
         addSubview(usernameLabel)
@@ -140,6 +139,7 @@ class UserProfileHeader: UICollectionViewCell{
         
         addSubview(stackView)
         
+        //view wont show up until you anchored it, dont forget translatesAutoresizingMaskIntoConstraints = false, but called inside anchor
         stackView.anchor(top: self.topAnchor, left: profileImageView.rightAnchor, bottom: nil, right: self.rightAnchor, paddingTop: 12, paddingLeft: 12, paddingBottom: 0, paddingRight: -12, width: 0, height: 50)
     }
     
@@ -157,7 +157,7 @@ class UserProfileHeader: UICollectionViewCell{
         stackView.distribution = .fillEqually
         
         addSubview(stackView)
-        stackView.anchor(top: nil, left: self.leftAnchor, bottom: self.bottomAnchor, right: self.rightAnchor, paddingTop: 0, paddingLeft: 0, paddingBottom: 0, paddingRight: 0, width: 0, height: 50)
+        stackView.anchor(top: nil, left: self.leftAnchor, bottom: self.bottomAnchor, right: self.rightAnchor, paddingTop: 0, paddingLeft: 0, paddingBottom: 0, paddingRight: 0, width: 0, height: 50) //set width to 0 to allow it to stretch 
         
         addSubview(topDividerView)
         topDividerView.anchor(top: stackView.topAnchor, left: self.leftAnchor, bottom: nil, right: self.rightAnchor, paddingTop: 0, paddingLeft: 0, paddingBottom: 0, paddingRight: 0, width: 0, height: 0.5)
@@ -187,14 +187,11 @@ class UserProfileHeader: UICollectionViewCell{
             guard let data = data else {return}
             
             let image = UIImage(data: data)
-            
+            //move from background to main queue
             DispatchQueue.main.async {
                 self.profileImageView.image = image
             }
         }.resume() //resumes the task if suspended, Newly-initialized tasks begin in a suspended state, so you need to call this method to start the task.
-        
-    
-        
         
     }
     

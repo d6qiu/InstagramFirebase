@@ -9,7 +9,7 @@
 import UIKit
 import Firebase
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate { //UIKit dispatches events to responders like appDelegate, The UIapplication object informs the delegate of significant runtime events, something happened, tells delegate to run its methods. 
 
     var window: UIWindow?
 
@@ -18,7 +18,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Override point for customization after application launch.
         FirebaseApp.configure()
         
-        window = UIWindow()
+        window = UIWindow() // uiwindow to change root view controller //must crete UIWindow if you dont use storyboard
         //set tabbar controller to rootcontroller
         window?.rootViewController = MainTabBarController()
         

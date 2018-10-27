@@ -8,7 +8,7 @@
 
 import UIKit
 import Firebase
-class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate{
+class SignUpController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate{ //delegate allows you to customize response
     
     let plusPhotoButton: UIButton = {
         let button = UIButton(type: .system) //.system makes it when you click it it fades to white for a sec
@@ -21,7 +21,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     
     @objc func handlePlusPhoto() {
         let imagePickerController = UIImagePickerController()
-        imagePickerController.delegate = self
+        imagePickerController.delegate = self //imagepickercontroll's delegate is type uiimagepcikercontrollerdelegate && uinavigationcontrollerdelegate, set delegate = self means it needs a reference of self object
         imagePickerController.allowsEditing = true
         present(imagePickerController, animated: true, completion: nil)
     }
@@ -151,6 +151,12 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
                                 return
                             }
                             print("successfully saved user info into db")
+                        
+                        //UIApplication is class, shared returns an instance, keyWindow is the most recenet shown/visible window 
+                        guard let mainTabBarController = UIApplication.shared.keyWindow?.rootViewController as? MainTabBarController else {return}
+                        mainTabBarController.setUpViewControllers()
+                        self.dismiss(animated: true, completion: nil)
+                        
                     })
                     
                 })
@@ -161,8 +167,33 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
       
     }
     
+    
+    let alreadyHaveAccountButton : UIButton = {
+        let button = UIButton(type: .system)
+        
+        let attributedTitle = NSMutableAttributedString(string: "Already have an account?  ", attributes: [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 14), NSAttributedString.Key.foregroundColor: UIColor.lightGray])
+        
+        attributedTitle.append(NSAttributedString(string: "Log In", attributes: [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 14), NSAttributedString.Key.foregroundColor: UIColor.rgb(red: 17, green: 154, blue: 237)]))
+        
+        button.setAttributedTitle(attributedTitle, for: .normal)
+        
+        button.addTarget(self, action: #selector(handleAlreadyHaveAccount), for: .touchUpInside) //wants to show logincontroller
+        
+        return button
+    }()
+    
+    @objc func handleAlreadyHaveAccount() {
+        //recall that you pushed self into the controller before in logincontroller.swift, of course poping means deleting this instance, and creats a new one everytime you push
+        _ = navigationController?.popViewController(animated: true) //can also use underscore to catch the returned by not gonna use value
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        view.addSubview(alreadyHaveAccountButton)
+        alreadyHaveAccountButton.anchor(top: nil, left: view.leftAnchor, bottom: view.bottomAnchor, right: view.rightAnchor, paddingTop: 0, paddingLeft: 0, paddingBottom: 0, paddingRight: 0, width: 0, height: 50)
+        
+        view.backgroundColor = .white
         view.addSubview(plusPhotoButton)
         
         plusPhotoButton.anchor(top: view.topAnchor, left: nil, bottom: nil, right: nil, paddingTop: 40, paddingLeft: 0, paddingBottom: 0, paddingRight: 0, width: 140, height: 140)
