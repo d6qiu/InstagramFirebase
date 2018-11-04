@@ -144,8 +144,8 @@ class SignUpController: UIViewController, UIImagePickerControllerDelegate, UINav
                     let dictionaryValues = ["username": username, "profileImageUrl": profileImageUrl]
                     let values = [uid: dictionaryValues]
                     
-                    //.setValue replace child node //append dictionary //key uid became child 
-                    Database.database().reference().child("users").updateChildValues(values, withCompletionBlock: { (err, ref) in
+                    //.setValue replace child node //append dictionary //key uid became child, child database has/contains a dictionary
+                    Database.database().reference().child("users").updateChildValues(values, withCompletionBlock: { (err, ref) in //updatechildvalues is just update this node's values
                             if let err = err {
                                 print("failed to save user info into db", err)
                                 return
@@ -224,28 +224,4 @@ class SignUpController: UIViewController, UIImagePickerControllerDelegate, UINav
 
 }
 
-extension UIView {
-    func anchor(top: NSLayoutYAxisAnchor?, left: NSLayoutXAxisAnchor?, bottom: NSLayoutYAxisAnchor?, right: NSLayoutXAxisAnchor?, paddingTop: CGFloat, paddingLeft: CGFloat, paddingBottom: CGFloat, paddingRight: CGFloat, width: CGFloat, height: CGFloat) {
-        
-        self.translatesAutoresizingMaskIntoConstraints = false // not using the system's auto resize mask as contraints, using your own contraints // makes object visible
-        
-        if let top = top {
-            self.topAnchor.constraint(equalTo: top, constant: paddingTop).isActive = true
-        }
-        if let left = left {
-            self.leftAnchor.constraint(equalTo: left, constant: paddingLeft).isActive = true
-        }
-        if let bottom = bottom {
-            self.bottomAnchor.constraint(equalTo: bottom, constant: paddingBottom).isActive = true
-        }
-        if let right = right {
-            self.rightAnchor.constraint(equalTo: right, constant: paddingRight).isActive = true
-        }
-        if width != 0 {
-            widthAnchor.constraint(equalToConstant: width).isActive = true
-        }
-        if height != 0 {
-            heightAnchor.constraint(equalToConstant: height).isActive = true
-        }
-    }
-}
+

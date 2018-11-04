@@ -12,14 +12,15 @@ class UserProfileHeader: UICollectionViewCell{
     
     var user: User? {
         didSet {
-            setUpProfileImage()
+            guard let profileImageUrl = user?.profileImageUrl else {return}
+            profileImageView.loadImage(urlString: profileImageUrl)
             
             usernameLabel.text = user?.username
         }
     }
     
-    let profileImageView: UIImageView = {
-       let iv = UIImageView()
+    let profileImageView: CustomImageView = {
+       let iv = CustomImageView()
         return iv
     }()
     
@@ -123,7 +124,7 @@ class UserProfileHeader: UICollectionViewCell{
         
         addSubview(usernameLabel)
         //has to set up bottomtoolbar anchor first cuz gridButton.topAnchor aint initialized yet, if width or height = 0, it streches
-        usernameLabel.anchor(top: profileImageView.bottomAnchor, left: self.leftAnchor, bottom: gridButton.topAnchor, right: self.rightAnchor, paddingTop: 4, paddingLeft: 12, paddingBottom: 0, paddingRight: -12, width: 0, height: 0)
+        usernameLabel.anchor(top: profileImageView.bottomAnchor, left: self.leftAnchor, bottom: gridButton.topAnchor, right: self.rightAnchor, paddingTop: 4, paddingLeft: 12, paddingBottom: 0, paddingRight: -12, width: 0, height: 0) //default text alignment is left
         
         setupUserStatsView()
         
@@ -168,32 +169,7 @@ class UserProfileHeader: UICollectionViewCell{
     
     
     
-    fileprivate func setUpProfileImage() {
-        guard let profileImageUrl = user?.profileImageUrl else {return}
-        
-        guard let url = URL(string: profileImageUrl) else {return}
-        //API for downloading content
-        URLSession.shared.dataTask(with: url) { (data, response, err) in
-            //if let for check nil, guard let for check not nil and unwrap
-            if let err = err {
-                print("failed to fetch profile image: ", err)
-                return
-            }
-            
-            //check for response status of 200(HTTP OK)???
-            //let response  = response as! HTTPURLResponse
-            //response.statusCode
-            
-            guard let data = data else {return}
-            
-            let image = UIImage(data: data)
-            //move from background to main queue
-            DispatchQueue.main.async {
-                self.profileImageView.image = image
-            }
-        }.resume() //resumes the task if suspended, Newly-initialized tasks begin in a suspended state, so you need to call this method to start the task.
-        
-    }
+    
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")

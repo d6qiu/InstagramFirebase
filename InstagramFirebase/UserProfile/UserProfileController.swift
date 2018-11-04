@@ -26,10 +26,57 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
         fetchUser() //command click into a function will get you there to the function 
         //need this else cuz no cell with identifier "headerId", whenever use deque think register and return number of cell or size of the supplementary view
         collectionView.register(UserProfileHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "headerId")
-        collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: cellId)
+        collectionView.register(UserProfilePhotoCell.self, forCellWithReuseIdentifier: cellId)
         
         setUpLogOutButton()
         
+        //fetchPosts()
+        fetchOrderPosts() //.observe(.childAdded will observe future posts being uploaded to database
+        
+    }
+    
+    fileprivate func fetchOrderPosts() {
+        guard let uid = Auth.auth().currentUser?.uid else {return}
+        let ref = Database.database().reference().child("posts").child(uid)
+        //observe data added in order unlike observeSingleEvent
+        //if data event type is .value, then snapshot is value of current database being referenced, if .childadded, then snapshot is value of its child
+        //child -> auto id 's value is dictionary has key creationDate, child key is just key of the dictionary of child
+        ref.queryOrdered(byChild: "creationDate").observe(.childAdded, with: { (snapshot) in //snapshot return the value of the child, the block is executed for each child in this database, if .value then block executed once and snapshot return value of this database
+            guard let dictionary = snapshot.value as? [String: Any] else {return} //as will prompt error because might fail
+            let post = Post(dictionary: dictionary)
+            self.posts.append(post)
+            
+            self.collectionView.reloadData()
+            
+        }) { (err) in
+            print("failed to get snapshot of ordered post just shared data", err)
+        }
+    }
+    
+    var posts = [Post]()
+    
+    fileprivate func fetchPosts() {
+        guard let uid = Auth.auth().currentUser?.uid else {return}
+        let ref = Database.database().reference().child("posts").child(uid)
+        //if data event type is .value, then snapshot is value of ref/current database
+        ref.observeSingleEvent(of: .value, with: { (snapshot) in
+ 
+            guard let dictionaries = snapshot.value as? [String: Any] else {return} //snape.value is a dicionary of autoid : any
+            dictionaries.forEach({ (key, value) in
+                //print("key \(key) value \(value)")
+                
+                guard let dictionary = value as? [String: Any] else {return}
+                
+                let post = Post(dictionary: dictionary)
+                self.posts.append(post)
+                
+            })
+            self.collectionView.reloadData()
+            
+            
+        }) { (err) in
+            print("Failed to fetch posts", err)
+        }
     }
     
     fileprivate func setUpLogOutButton() { //.alwaysOriginal prevent system treating it as template which is that it will be filled with color blue
@@ -58,12 +105,14 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
     
     //MARK: - collectionViewdatasource methods == give me something
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 7
+        return posts.count
     }
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath)
-        cell.backgroundColor = .purple
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath) as! UserProfilePhotoCell
+        
+        cell.post = posts[indexPath.item] //didset upon creation 
+        
         return cell
     }
     //MARK: - collectionviewflowlayout delegate methods
@@ -106,6 +155,7 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
         //uses dictionary to construct database, cast retrieved value back to dictionary
         //event triggered handler block called when at first retrive persisted data on firebase
         Database.database().reference().child("users").child(uid).observeSingleEvent(of: .value, with: { (snapshot) in
+            //child(uid) has dictionary snapshot
             print(snapshot.value ?? "")
             guard let dictionary = snapshot.value as? [String: Any] else {return}
             
@@ -122,7 +172,7 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
     }
     
 }
-//groups information, cleans code, //instead of fetching user profile image again from database, create a user struct, stores fetched database data inside, and send it header by header.user = self.user at line 31
+//groups information, cleans code, //instead of fetching user profile image again from database, create a user struct, stores fetched database data inside, and send it header by header.user = self.user at line 125
 struct User {
     let username: String
     let profileImageUrl: String
