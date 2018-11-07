@@ -9,10 +9,17 @@
 import Foundation
 //strust is value type class is reference type
 struct Post {
-    let imageUrl: String //struct dont need initializers, class does
+    
+    let user: User
+    let imageUrl: String
+    let caption: String
     
     //but u can
-    init(dictionary: [String: Any]) {
-        imageUrl = dictionary["imageUrl"] as? String ?? "" //unwrap this way 
+    init(user: User, dictionary: [String: Any]) {
+        self.user = user
+        self.imageUrl = dictionary["imageUrl"] as? String ?? "" //unwrap this way
+        self.caption = dictionary["caption"] as? String ?? ""
+        
+        
     }
 }

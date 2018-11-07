@@ -71,7 +71,7 @@ class LoginController: UIViewController {
         button.setTitleColor(.white, for: .normal)
        
         button.addTarget(self, action: #selector(handleLogin), for: .touchUpInside)
-        
+
         button.isEnabled = false
         return button
     }()
@@ -106,9 +106,8 @@ class LoginController: UIViewController {
         attributedTitle.append(NSAttributedString(string: "Sign Up", attributes: [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 14), NSAttributedString.Key.foregroundColor: UIColor.rgb(red: 17, green: 154, blue: 237)]))
         
         button.setAttributedTitle(attributedTitle, for: .normal)
-        
-        button.addTarget(self, action: #selector(handleShowSignUp), for: .touchUpInside)
-        
+        button.addTarget(nil, action: #selector(handleShowSignUp), for: .touchUpInside) //self is bascially nil at the point, if nil, The target object—that is, the object whose action method is called. If you specify nil, UIKit searches the responder chain for an object that responds to the specified action message and delivers the message to that object.
+        //print(button.allTargets) target is nil
         return button
     }()
     

@@ -7,7 +7,7 @@
 //
 
 import UIKit
-
+import Firebase
 class UserProfileHeader: UICollectionViewCell{
     
     var user: User? {
@@ -16,7 +16,21 @@ class UserProfileHeader: UICollectionViewCell{
             profileImageView.loadImage(urlString: profileImageUrl)
             
             usernameLabel.text = user?.username
+            
+            setupEditFollowButton()
+            
         }
+    }
+    
+    fileprivate func setupEditFollowButton() {
+        guard let currentLoggedInUserId = Auth.auth().currentUser?.uid else {return}
+        guard let userId = user?.uid else {return}
+        if currentLoggedInUserId == userId {
+
+        } else {
+            editProfileFollowButton.setTitle("Follow", for: .normal)
+        }
+
     }
     
     let profileImageView: CustomImageView = {
@@ -98,7 +112,7 @@ class UserProfileHeader: UICollectionViewCell{
         return label
     }()
     
-    let editProfileButton: UIButton = {
+    lazy var editProfileFollowButton: UIButton = { //if let editProfile doesnt work, use lazy var 
         let button = UIButton(type: .system)
         button.setTitle("Edit Profile", for: .normal)
         button.setTitleColor(.black, for: .normal)
@@ -107,8 +121,14 @@ class UserProfileHeader: UICollectionViewCell{
         button.layer.borderWidth = 1 //default is 0 which means no border
         button.layer.cornerRadius = 3
         
+        button.addTarget(self, action: #selector(handleEditProfileOrFollow), for: .touchUpInside)
+        //print(button.allTargets.first?.description)
         return button
     }()
+    
+    @objc func handleEditProfileOrFollow() {
+        print("unfollow/follow ")
+    }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -128,8 +148,8 @@ class UserProfileHeader: UICollectionViewCell{
         
         setupUserStatsView()
         
-        addSubview(editProfileButton)
-        editProfileButton.anchor(top: postLabel.bottomAnchor, left: postLabel.leftAnchor, bottom: nil, right: followingLabel.rightAnchor, paddingTop: 2, paddingLeft: 0, paddingBottom: 0, paddingRight: 0, width: 0, height: 34)
+        addSubview(editProfileFollowButton)
+        editProfileFollowButton.anchor(top: postLabel.bottomAnchor, left: postLabel.leftAnchor, bottom: nil, right: followingLabel.rightAnchor, paddingTop: 2, paddingLeft: 0, paddingBottom: 0, paddingRight: 0, width: 0, height: 34)
         
         
     }

@@ -14,6 +14,8 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
     
     let cellId = "cellId"
     
+    var userId: String?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -21,30 +23,34 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
         
         collectionView?.backgroundColor = .white
         //uid is nil, call again when reload
-        navigationItem.title = Auth.auth().currentUser?.uid
         
-        fetchUser() //command click into a function will get you there to the function 
+        
         //need this else cuz no cell with identifier "headerId", whenever use deque think register and return number of cell or size of the supplementary view
         collectionView.register(UserProfileHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "headerId")
         collectionView.register(UserProfilePhotoCell.self, forCellWithReuseIdentifier: cellId)
         
         setUpLogOutButton()
-        
+        fetchUser() //command click into a function will get you there to the function
         //fetchPosts()
-        fetchOrderPosts() //.observe(.childAdded will observe future posts being uploaded to database
+        //fetchOrderPosts() //.observe(.childAdded will observe future posts being uploaded to database
         
     }
     
     fileprivate func fetchOrderPosts() {
-        guard let uid = Auth.auth().currentUser?.uid else {return}
+        guard let uid = self.user?.uid else {return}
         let ref = Database.database().reference().child("posts").child(uid)
         //observe data added in order unlike observeSingleEvent
         //if data event type is .value, then snapshot is value of current database being referenced, if .childadded, then snapshot is value of its child
         //child -> auto id 's value is dictionary has key creationDate, child key is just key of the dictionary of child
         ref.queryOrdered(byChild: "creationDate").observe(.childAdded, with: { (snapshot) in //snapshot return the value of the child, the block is executed for each child in this database, if .value then block executed once and snapshot return value of this database
+            
             guard let dictionary = snapshot.value as? [String: Any] else {return} //as will prompt error because might fail
-            let post = Post(dictionary: dictionary)
-            self.posts.append(post)
+            
+            guard let user = self.user else {return}
+            let post = Post(user: user, dictionary: dictionary)
+            
+            //put the newest post on first index 
+            self.posts.insert(post, at: 0) //array .insert will insert at index, to the left of already exist element and push everything back
             
             self.collectionView.reloadData()
             
@@ -55,29 +61,30 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
     
     var posts = [Post]()
     
-    fileprivate func fetchPosts() {
-        guard let uid = Auth.auth().currentUser?.uid else {return}
-        let ref = Database.database().reference().child("posts").child(uid)
-        //if data event type is .value, then snapshot is value of ref/current database
-        ref.observeSingleEvent(of: .value, with: { (snapshot) in
- 
-            guard let dictionaries = snapshot.value as? [String: Any] else {return} //snape.value is a dicionary of autoid : any
-            dictionaries.forEach({ (key, value) in
-                //print("key \(key) value \(value)")
-                
-                guard let dictionary = value as? [String: Any] else {return}
-                
-                let post = Post(dictionary: dictionary)
-                self.posts.append(post)
-                
-            })
-            self.collectionView.reloadData()
-            
-            
-        }) { (err) in
-            print("Failed to fetch posts", err)
-        }
-    }
+//    fileprivate func fetchPosts() {
+//        guard let uid = Auth.auth().currentUser?.uid else {return}
+//        let ref = Database.database().reference().child("posts").child(uid)
+//        //if data event type is .value, then snapshot is value of ref/current database
+//        ref.observeSingleEvent(of: .value, with: { (snapshot) in
+//
+//            guard let dictionaries = snapshot.value as? [String: Any] else {return} //snape.value is a dicionary of autoid : any
+//            dictionaries.forEach({ (key, value) in
+//                //print("key \(key) value \(value)")
+//
+//                guard let dictionary = value as? [String: Any] else {return}
+//
+//                let dummyUser = User(dictionary: ["username": "me"])
+//                let post = Post(user: dummyUser, dictionary: dictionary)
+//                self.posts.append(post)
+//
+//            })
+//            self.collectionView.reloadData()
+//
+//
+//        }) { (err) in
+//            print("Failed to fetch posts", err)
+//        }
+//    }
     
     fileprivate func setUpLogOutButton() { //.alwaysOriginal prevent system treating it as template which is that it will be filled with color blue
         navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(named: "gear")?.withRenderingMode(.alwaysOriginal), style: .plain, target: self, action: #selector(handleLogOut))
@@ -148,37 +155,21 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
     
     var user: User?
     fileprivate func fetchUser() {
+        //when userId is not set by UserSearchController, uid = currentuser.uid
+        let uid = userId ?? (Auth.auth().currentUser?.uid ?? "") //another way to unwrap to get rid of compile errors
         
-        guard let uid = Auth.auth().currentUser?.uid else {return}
+        //guard let uid = Auth.auth().currentUser?.uid else {return}
         
-        //observeSingleEvent means stop listening after one event, which means only does/retriece initial data from database, observe() does initial data and later changes.
-        //uses dictionary to construct database, cast retrieved value back to dictionary
-        //event triggered handler block called when at first retrive persisted data on firebase
-        Database.database().reference().child("users").child(uid).observeSingleEvent(of: .value, with: { (snapshot) in
-            //child(uid) has dictionary snapshot
-            print(snapshot.value ?? "")
-            guard let dictionary = snapshot.value as? [String: Any] else {return}
-            
-            self.user = User(dictionary: dictionary)
+        Database.fetchUserWithUID(uid: uid) { (user) in
+            self.user = user
             
             self.navigationItem.title = self.user?.username
             
             self.collectionView.reloadData() //just reload data when observe event //triggers all the datasource and delegate methods
             
-        }) { (err) in
-            print("Failed to fetch user:", err)
+            self.fetchOrderPosts() //.observe(.childAdded will observe future posts being uploaded to database
         }
         
     }
     
-}
-//groups information, cleans code, //instead of fetching user profile image again from database, create a user struct, stores fetched database data inside, and send it header by header.user = self.user at line 125
-struct User {
-    let username: String
-    let profileImageUrl: String
-    
-    init(dictionary: [String: Any]) {
-        username = dictionary["username"] as? String ?? ""
-        profileImageUrl = dictionary["profileImageUrl"] as? String ?? ""
-    }
 }
