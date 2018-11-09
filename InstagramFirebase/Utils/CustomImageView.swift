@@ -17,6 +17,8 @@ class CustomImageView: UIImageView {
         
         lastURLUsedToLoad = urlString
         
+        self.image = nil //gets rid of flicking 
+        
         //downloading image cost network data usage, so cache them 
         if let cachedImage = imageCache[urlString] {
             self.image = cachedImage

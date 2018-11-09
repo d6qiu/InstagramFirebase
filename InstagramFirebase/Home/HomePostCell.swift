@@ -34,7 +34,8 @@ class HomePostCell: UICollectionViewCell {
         
         attributedText.append(NSAttributedString(string: "\n\n", attributes: [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 4)]))
         
-        attributedText.append(NSAttributedString(string: "one week", attributes: [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 14), NSAttributedString.Key.foregroundColor: UIColor.gray])) //foreground color is color of text
+        let timeAgoDisplay = post.creationDate.timeAgoDisplay()
+        attributedText.append(NSAttributedString(string: timeAgoDisplay, attributes: [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 14), NSAttributedString.Key.foregroundColor: UIColor.gray])) //foreground color is color of text
         
         captionLabel.attributedText = attributedText
     }
