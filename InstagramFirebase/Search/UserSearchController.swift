@@ -11,11 +11,11 @@ import Firebase
 
 class UserSearchController: UICollectionViewController, UICollectionViewDelegateFlowLayout, UISearchBarDelegate{
     
-    lazy var searchBar: UISearchBar = { //lazy var instead of let is required because self/usersearchcontroller must be instantiated before variable is defined, else err: Cannot assign value of type '(UserSearchController) -> () -> (UserSearchController)' to type 'UISearchBarDelegate?'
+    lazy var searchBar: UISearchBar = { //lazy var instead of let is required because self/usersearchcontroller must be instantiated before variable is defined, else err: Cannot assign value of type '(UserSearchController) -> () -> (UserSearchController)' to type 'UISearchBarDelegate?' when set sb.delegate = self
         let sb = UISearchBar()
         sb.placeholder = "Enter username"
         sb.barTintColor = .gray
-        UITextField.appearance(whenContainedInInstancesOf: [UISearchBar.self]).backgroundColor = UIColor.rgb(red: 230, green: 230, blue: 230)
+        UITextField.appearance(whenContainedInInstancesOf: [UISearchBar.self]).backgroundColor = UIColor.rgb(red: 230, green: 230, blue: 230) //get the textfeild contained in this class
         
         sb.delegate = self //make sure self exist before accessing it by making searchbar a lazy vairable
         
@@ -28,7 +28,7 @@ class UserSearchController: UICollectionViewController, UICollectionViewDelegate
         if searchText.isEmpty {
             filteredUsers = users
         } else {
-            filteredUsers = users.filter { (user) -> Bool in //filter takes in a bool function as parameter that determines whether to keep it in the result collection
+            filteredUsers = users.filter { (user) -> Bool in //filter takes in a function that returns a bool as parameter that determines whether to keep it in the result collection
                 return user.username.lowercased().contains(searchText.lowercased())
             }
         }
@@ -125,7 +125,8 @@ class UserSearchController: UICollectionViewController, UICollectionViewDelegate
         return cell
     }
     
+    //collection view shows rows and not grid because cgsize width is set to view.frame.width 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: view.frame.width, height: 66) //profileimage is 50 + 8 + 8 for padding 
+        return CGSize(width: view.frame.width, height: 66) //profileimage is 50 + 8 + 8 for padding
     }
 }

@@ -153,6 +153,7 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
     }
     
     
+    
     var user: User?
     fileprivate func fetchUser() {
         //when userId is not set by UserSearchController, uid = currentuser.uid
