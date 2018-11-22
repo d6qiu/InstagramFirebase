@@ -10,11 +10,25 @@ import UIKit
 import Firebase
 
 //comand space click UICollectionViewDelegateFlowLayout to see protocol methods, or just google
-class UserProfileController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
+class UserProfileController: UICollectionViewController, UICollectionViewDelegateFlowLayout, UserProfileHeaderDelegate {
     
     let cellId = "cellId"
     
     var userId: String?
+    
+    var isGridView = true //default is grid view
+    
+    let homePostCellId = "homePostCellId"
+    
+    func didChangeToGridView() {
+        isGridView = true
+        collectionView.reloadData() //calls cell methods again to display the right ones
+    }
+    
+    func didChangeToListView() {
+        isGridView = false
+        collectionView.reloadData()
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -28,6 +42,7 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
         //need this else cuz no cell with identifier "headerId", whenever use deque think register and return number of cell or size of the supplementary view
         collectionView.register(UserProfileHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "headerId")
         collectionView.register(UserProfilePhotoCell.self, forCellWithReuseIdentifier: cellId)
+        collectionView.register(HomePostCell.self, forCellWithReuseIdentifier: homePostCellId)
         
         setUpLogOutButton()
         fetchUser() //command click into a function will get you there to the function
@@ -36,11 +51,61 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
         
     }
     
+    var isFinishedPaging = false
+    var posts = [Post]()
+    
+    fileprivate func paginatePosts() {
+        guard let uid = self.user?.uid else {return}
+        //each child is a dictionary, has value, and it's name as key
+        let ref = Database.database().reference().child("posts").child(uid)
+        
+        //queryOrderedbykey dont sort the keys, just goes down keys as date added to the database
+        //var query = ref.queryOrderedByKey()
+        //print(query)
+        var query = ref.queryOrdered(byChild: "creationDate") //sorted by the specific attribute/value of the child, child is autoid, creationDate is a key of autoid's value
+        if posts.count > 0 { //if not first round
+            let value = posts.last?.creationDate.timeIntervalSince1970
+            query = query.queryEnding(atValue: value) //query til ends at value
+            //query = query.queryStarting(atValue: value)
+        }
+        
+        //queryordered base on creationDate, last 4 element ending at value
+        //if first round, just last 4 on creationDate
+        query.queryLimited(toLast: 4).observeSingleEvent(of: .value, with: { (snapshot) in
+            guard var allObjects = snapshot.children.allObjects as? [DataSnapshot] else {return} //want array of snapshot children, which is just value of the snapshot
+            
+            allObjects.reverse()
+            
+            if allObjects.count < 4 { //if less than 4 , out of elements to page
+                self.isFinishedPaging = true
+            }
+            
+            if self.posts.count > 0 && allObjects.count > 0 {
+                allObjects.removeFirst() //the first one of second paging is repeated
+            }
+            
+            guard let user = self.user else {return}
+            
+            //snapshot here is different than the above one , snapshot is each child of the above one
+            allObjects.forEach({ (snapshot) in //for loop to iterate each element/autoid child
+                guard let dictionary = snapshot.value as? [String: Any] else {return}
+                var post = Post(user: user, dictionary: dictionary)
+                post.id = snapshot.key //snapshot.key is autoid for each post, snapshot value is a dictioanrhy of attributes posts
+                self.posts.append(post)
+            })
+
+            self.collectionView.reloadData()
+        }) { (err) in
+            print("failed to fetch paginateposts", err)
+        }
+    }
+    
+    
     fileprivate func fetchOrderPosts() {
         guard let uid = self.user?.uid else {return}
         let ref = Database.database().reference().child("posts").child(uid)
         //observe data added in order unlike observeSingleEvent
-        //if data event type is .value, then snapshot is value of current database being referenced, if .childadded, then snapshot is value of its child
+        //if data event type is .value, then snapshot is current database being referenced, if .childadded, then snapshot is its child
         //child -> auto id 's value is dictionary has key creationDate, child key is just key of the dictionary of child
         ref.queryOrdered(byChild: "creationDate").observe(.childAdded, with: { (snapshot) in //snapshot return the value of the child, the block is executed for each child in this database, if .value then block executed once and snapshot return value of this database
             
@@ -59,8 +124,9 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
         }
     }
     
-    var posts = [Post]()
     
+    
+    //fetch unordered poosts
 //    fileprivate func fetchPosts() {
 //        guard let uid = Auth.auth().currentUser?.uid else {return}
 //        let ref = Database.database().reference().child("posts").child(uid)
@@ -85,6 +151,10 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
 //            print("Failed to fetch posts", err)
 //        }
 //    }
+    
+    
+    
+    
     
     fileprivate func setUpLogOutButton() { //.alwaysOriginal prevent system treating it as template which is that it will be filled with color blue
         navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(named: "gear")?.withRenderingMode(.alwaysOriginal), style: .plain, target: self, action: #selector(handleLogOut))
@@ -116,11 +186,21 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
     }
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath) as! UserProfilePhotoCell
         
-        cell.post = posts[indexPath.item] //didset upon creation 
+        if indexPath.item == self.posts.count - 1  && !isFinishedPaging { //if last post in the array
+            paginatePosts()
+        }
         
-        return cell
+        
+        if isGridView == true {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath) as! UserProfilePhotoCell
+            cell.post = posts[indexPath.item] //didset upon creation
+            return cell
+        } else {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: homePostCellId, for: indexPath) as! HomePostCell
+            cell.post = posts[indexPath.item]
+            return cell
+        }
     }
     //MARK: - collectionviewflowlayout delegate methods
     //nextTo spacing
@@ -133,9 +213,17 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
         return 1
     }
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let width = (view.frame.width - 2) / 3 //-2 pixels from the nextTo spacings, otherwise since 3 * cellItem will exceed view.frame.width, flowlayout will automatically put the next cell in the next row
-        return CGSize(width: width, height: width)
         
+        if isGridView == true {
+            let width = (view.frame.width - 2) / 3 //-2 pixels from the nextTo spacings, otherwise since 3 * cellItem will exceed view.frame.width, flowlayout will automatically put the next cell in the next row
+            return CGSize(width: width, height: width)
+        } else {
+            var height: CGFloat = 40 + 8 + 8 // username + padding top + imageView padding top
+            height += view.frame.width
+            height += 50 //bottom context buttons
+            height += 80 //caption space
+            return CGSize(width: view.frame.width, height: height) //so imageView will be a square
+        }
     }
     
     //called once when initialize collectionView
@@ -148,6 +236,7 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
         //triggers init of userProfileHeader 
         let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "headerId", for: indexPath) as! UserProfileHeader
         header.user = self.user
+        header.delegate = self //userprofileheader has the delegate property
         
         return header
     }
@@ -168,7 +257,8 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
             
             self.collectionView.reloadData() //just reload data when observe event //triggers all the datasource and delegate methods
             
-            self.fetchOrderPosts() //.observe(.childAdded will observe future posts being uploaded to database
+            self.paginatePosts()
+            //self.fetchOrderPosts() //.observe(.childAdded will observe future posts being uploaded to database
         }
         
     }

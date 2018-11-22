@@ -8,7 +8,16 @@
 
 import UIKit
 import Firebase
+
+protocol UserProfileHeaderDelegate {
+    func didChangeToListView()
+    func didChangeToGridView()
+}
+
+
 class UserProfileHeader: UICollectionViewCell{
+    
+    var delegate: UserProfileHeaderDelegate?
     
     var user: User? {
         didSet {
@@ -102,18 +111,32 @@ class UserProfileHeader: UICollectionViewCell{
     }()
     
     //MARK: - Bottom tool bar variables
-    let gridButton: UIButton = {
+    lazy var gridButton: UIButton = {
         let button = UIButton(type: .system)
         button.setImage(UIImage(named: "grid"), for: .normal)
+        button.addTarget(self, action: #selector(handleChangeToGridView), for: .touchUpInside)
         return button
     }()
     
-    let listButton: UIButton = {
+    @objc func handleChangeToGridView() {
+        gridButton.tintColor = UIColor.mainBlue()
+        listButton.tintColor = UIColor(white: 0, alpha: 0.2)
+        delegate?.didChangeToGridView()
+    }
+    
+    lazy var listButton: UIButton = {
         let button = UIButton(type: .system)
         button.setImage(UIImage(named: "list"), for: .normal)
         button.tintColor = UIColor(white: 0, alpha: 0.2)
+        button.addTarget(self, action: #selector(handleChangeToListView), for: .touchUpInside)
         return button
     }()
+    
+    @objc func handleChangeToListView() {
+        listButton.tintColor = UIColor.mainBlue()
+        gridButton.tintColor = UIColor(white: 0, alpha: 0.2)
+        delegate?.didChangeToListView() //tells useprofilecontroller to change the ui elements, this class dont have the scope to do so
+    }
     
     let bookmarkButton: UIButton = {
         let button = UIButton(type: .system)

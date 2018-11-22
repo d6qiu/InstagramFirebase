@@ -66,14 +66,14 @@ class CameraController: UIViewController, AVCapturePhotoCaptureDelegate, UIViewC
     
     let customAnimationPresentor = CustomAnimationPresentor()
     let customAnimationDismisser = CustomAnimationDismisser()
-    //transition delegate methods //so when self gets presented animaiton
+    //transition delegate methods //so when self gets presented or dismissed, provides custom animation for it, when self gets presented ,call this 
     func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         return customAnimationPresentor
     }
     
-    
+    //when self gets dimissed, call this
     func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        return CustomAnimationDismisser
+        return customAnimationDismisser
     }
     
     override var prefersStatusBarHidden: Bool {

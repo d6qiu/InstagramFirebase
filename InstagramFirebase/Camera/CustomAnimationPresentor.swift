@@ -15,15 +15,15 @@ class CustomAnimationPresentor: NSObject, UIViewControllerAnimatedTransitioning 
     func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
         let containerView = transitionContext.containerView
         
-        guard let fromView = transitionContext.view(forKey: .from) else {return}
+        guard let fromView = transitionContext.view(forKey: .from) else {return} //get reference of homecontroller's view
         
-        guard let toView = transitionContext.view(forKey: .to) else {return}
+        guard let toView = transitionContext.view(forKey: .to) else {return} //get reference of cameracontroller's view 
         containerView.addSubview(toView)
         
         //in case of camera controller, camera controller is toview, when presented, set start frame then animation
         let startingFrame = CGRect(x: -toView.frame.width, y: 0, width: toView.frame.width, height: toView.frame.height)
         toView.frame = startingFrame
-        
+        //everything shrifts right
         UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 1, options: .curveEaseOut, animations: {
             
             toView.frame = CGRect(x: 0, y: 0, width: toView.frame.width, height: toView.frame.height)

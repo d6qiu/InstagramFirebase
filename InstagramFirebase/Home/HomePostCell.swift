@@ -8,11 +8,23 @@
 
 import UIKit
 
+protocol HomePostCellDelegate {
+    func didTapComment(post: Post)
+    func didLike(for cell: HomePostCell)
+}
+
+
 class HomePostCell: UICollectionViewCell {
+    
+    //delegate allows to get reference of desired classes without creating a new instantiaiton to that class
+    var delegate: HomePostCellDelegate?
     
     var post: Post? {
         didSet {
             guard let postImageUrl = post?.imageUrl else {return}
+            
+            likeButton.setImage(post?.hasLiked == true ? UIImage(named: "like_selected")?.withRenderingMode(.alwaysOriginal) : UIImage(named: "like_unselected")?.withRenderingMode(.alwaysOriginal), for: .normal)
+            
             photoImageView.loadImage(urlString: postImageUrl)
             
             usernameLabel.text = post?.user.username
@@ -68,17 +80,35 @@ class HomePostCell: UICollectionViewCell {
         return button
     }()
     
-    let likeButton: UIButton = {
+    lazy var likeButton: UIButton = {
        let button = UIButton(type: .system)
         button.setImage(UIImage(named: "like_unselected")?.withRenderingMode(.alwaysOriginal), for: .normal)
+        button.addTarget(nil, action: #selector(handleLike), for: .touchUpInside)
         return button
     }()
     
-    let commentButton: UIButton = {
+    @objc func handleLike() {
+        delegate?.didLike(for: self)
+    }
+    
+    lazy var commentButton: UIButton = {
         let button = UIButton(type: .system)
         button.setImage(UIImage(named: "comment")?.withRenderingMode(.alwaysOriginal), for: .normal)
+        button.addTarget(self, action: #selector(handleComment), for: .touchUpInside)
         return button
     }()
+    
+    //when action dont fireof, try lazy var on button
+    @objc func handleComment() {
+        //present is view controller method, have to use custom delegation here to get reference of homecontroller to use the present method to handle commentbutton event
+        //or if use push cell does not have reference to navigation controller, cant use push either, have to delegate to homecontroler
+        guard let post = post else {return}
+        delegate?.didTapComment(post: post) //the event comment button is triggered, tells the delegate to handle/respond to the event
+        
+        
+    }
+    
+    
     let sendMessageButton: UIButton = {
         let button = UIButton(type: .system)
         button.setImage(UIImage(named: "send2")?.withRenderingMode(.alwaysOriginal), for: .normal)

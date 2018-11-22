@@ -9,11 +9,14 @@
 import Foundation
 //strust is value type class is reference type
 struct Post {
-    
+    var id: String?
     let user: User
     let imageUrl: String
     let caption: String
     let creationDate: Date
+    
+    var hasLiked: Bool = false
+    
     //but u can
     init(user: User, dictionary: [String: Any]) {
         self.user = user

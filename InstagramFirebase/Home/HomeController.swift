@@ -10,7 +10,7 @@ import UIKit
 import Firebase
 
 
-class HomeController: UICollectionViewController, UICollectionViewDelegateFlowLayout{
+class HomeController: UICollectionViewController, UICollectionViewDelegateFlowLayout, HomePostCellDelegate{
     let cellId = "cellId"
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -78,10 +78,10 @@ class HomeController: UICollectionViewController, UICollectionViewDelegateFlowLa
 
         let ref = Database.database().reference().child("posts").child(user.uid) //fetching post with the corresponding user and not the current user
         //if data event type is .value, then snapshot is value of ref/current database
-        ref.observeSingleEvent(of: .value, with: { (snapshot) in
+        ref.observeSingleEvent(of: .value, with: { (snapshot) in //snapshot is the child(user.uid) itself. snapshot.key is userid
             
             self.collectionView.refreshControl?.endRefreshing() //end the refreshing animation but only after user stopped dragging
-            
+            //snapshot.key is user id
             guard let dictionaries = snapshot.value as? [String: Any] else {return} //snape.value is a dicionary of autoid : any
             
             dictionaries.forEach({ (key, value) in
@@ -89,17 +89,30 @@ class HomeController: UICollectionViewController, UICollectionViewDelegateFlowLa
                 
                 guard let dictionary = value as? [String: Any] else {return}
                 
+                var post = Post(user: user, dictionary: dictionary)
+                post.id = key
                 
-                let post = Post(user: user, dictionary: dictionary)
-                self.posts.append(post)
+                guard let uid = Auth.auth().currentUser?.uid else {return} //uid is the key of dictionary of child(postid) value
+                Database.database().reference().child("likes").child(key).child(uid).observeSingleEvent(of: .value, with: { (snapshot) in
+                    if let value = snapshot.value as? Int, value == 1 {
+                        post.hasLiked = true
+                    } else {
+                        post.hasLiked = false
+                    }
+                    self.posts.append(post)
+                    
+                    self.posts.sort(by: { (p1, p2) -> Bool in
+                        return p1.creationDate.compare(p2.creationDate) == .orderedDescending //recent goes to left, bigger goes to left
+                    })
+                    
+                    self.collectionView.reloadData()
+                }, withCancel: { (err) in
+                    print("failed to fetch like status for posts:", err)
+                })
+                
                 
             })
             
-            self.posts.sort(by: { (p1, p2) -> Bool in
-                return p1.creationDate.compare(p2.creationDate) == .orderedDescending //recent goes to left, bigger goes to left 
-            })
-            
-            self.collectionView.reloadData()
             
             
         }) { (err) in
@@ -135,8 +148,42 @@ class HomeController: UICollectionViewController, UICollectionViewDelegateFlowLa
         
         cell.post = posts[indexPath.item]
         
+        cell.delegate = self //so cell gets a reference of self/homecontroller
         
         return cell
+    }
+    
+    
+    func didTapComment(post: Post) {
+        //cannet convert type to object means missing parenthese at the end
+        let commentsController = CommentsController(collectionViewLayout: UICollectionViewFlowLayout()) //has to specify layout cuz its a collectionview
+        
+        commentsController.post = post
+        
+        navigationController?.pushViewController(commentsController, animated: true)
+    }
+    
+    func didLike(for cell: HomePostCell) {
+        guard let indexPath = collectionView.indexPath(for: cell) else {return}
+        var post = posts[indexPath.item] //gets a copy of struct post since struct is value type
+        guard let postId = post.id else {return}
+        guard let uid = Auth.auth().currentUser?.uid else {return}
+        let values = [uid: post.hasLiked == true ? 0 : 1]
+        //need child(postId) so when fetch likes you know which post to for
+        Database.database().reference().child("likes").child(postId).updateChildValues(values) { (err, ref) in
+            if let err = err {
+                print("failed to like post ", err )
+                return
+            }
+            
+            print("succesfullu liked the post")
+            
+            post.hasLiked = !post.hasLiked
+            
+            self.posts[indexPath.item] = post //since struct is value type, the line above var post = posts[indexPath.item] //gets a copy of struct post since struct is value type
+            self.collectionView.reloadItems(at: [indexPath])
+        }
+        
     }
     
     
