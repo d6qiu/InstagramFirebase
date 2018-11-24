@@ -8,7 +8,7 @@
 
 import UIKit
 import Firebase
-class CommentsController: UICollectionViewController, UICollectionViewDelegateFlowLayout { //collection view set collectionview delegate to self/conllectionviewcontroller, flowlayout delegate = colllection view's delegate
+class CommentsController: UICollectionViewController, UICollectionViewDelegateFlowLayout, CommentInputAccessoryViewDelegate{ //collection view set collectionview delegate to self/conllectionviewcontroller, flowlayout delegate = colllection view's delegate
     
     var post: Post? //set in homepostcell
     
@@ -96,51 +96,35 @@ class CommentsController: UICollectionViewController, UICollectionViewDelegateFl
         super.viewWillDisappear(animated) //run the necessary code from super
         tabBarController?.tabBar.isHidden = false
     }
+    
     //cuz lazy var instatiate after viewdidload, so has access to controller' properties
-    lazy var containerView: UIView = {
-        let containerView = UIView()
-        containerView.backgroundColor = .white
-        containerView.frame = CGRect(x: 0, y: 0, width: 100, height: 50) //width 100 is ignored? since has to be same as keyboard width
+    lazy var containerView: CommentInputAccessoryView = {
+        let frame = CGRect(x: 0, y: 0, width: view.frame.width, height: 50) //width ignored since has to be same as keyboard width
+        let commentInputAccessoryView = CommentInputAccessoryView(frame: frame)
+        commentInputAccessoryView.delegate = self
         
-        let submitButton = UIButton(type: .system) //.system makes button pressed down when tap it
-        submitButton.setTitle("Submit", for: .normal)
-        submitButton.setTitleColor(.black, for: .normal)
-        submitButton.titleLabel?.font = UIFont.boldSystemFont(ofSize: 14)
-        submitButton.addTarget(nil, action: #selector(handleSubmit), for: .touchUpInside)
         
-        containerView.addSubview(submitButton)
-        submitButton.anchor(top: containerView.topAnchor, left: nil, bottom: containerView.bottomAnchor, right: containerView.rightAnchor, paddingTop: 0, paddingLeft: 0, paddingBottom: 0, paddingRight: -12, width: 50, height: 0)
-        
+        return commentInputAccessoryView
 
-        containerView.addSubview(commentTextField)
-        commentTextField.anchor(top: containerView.topAnchor, left: containerView.leftAnchor, bottom: containerView.bottomAnchor, right: submitButton.leftAnchor, paddingTop: 0, paddingLeft: 12, paddingBottom: 0, paddingRight: 0, width: 0, height: 0)
-        
-        let lineSeperatorView = UIView()
-        lineSeperatorView.backgroundColor = UIColor.rgb(red: 230, green: 230, blue: 230)
-        containerView.addSubview(lineSeperatorView)
-        lineSeperatorView.anchor(top: containerView.topAnchor, left: containerView.leftAnchor, bottom: nil, right: containerView.rightAnchor, paddingTop: 0, paddingLeft: 0, paddingBottom: 0, paddingRight: 0, width: 0, height: 0.5)
-        
-        return containerView
     }()
     
-    let commentTextField: UITextField = {
-        let textField = UITextField()
-        textField.placeholder = "Enter comment"
-        return textField
-    }()
-    
-    @objc func handleSubmit() {
+    func didSubmit(for comment: String) {
         guard let uid = Auth.auth().currentUser?.uid else {return}
         let postId = post?.id ?? ""
-        let values = ["text": commentTextField.text ?? "", "creationDate": Date().timeIntervalSince1970, "uid": uid] as [String: Any]
+        let values = ["text": comment, "creationDate": Date().timeIntervalSince1970, "uid": uid] as [String: Any]
         Database.database().reference().child("comments").child(postId).childByAutoId().updateChildValues(values) { (err, ref) in
             if let err = err {
                 print("failed to insert comment", err)
                 return
             }
             print("succesfully inserted comment")
+            
+            self.containerView.clearCommentTextField()
         }
+        
+        
     }
+    
     
     //keyboard does not include the textfield and the send button, those are implemented by you via this.
     override var inputAccessoryView: UIView? {
