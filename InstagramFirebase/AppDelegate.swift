@@ -25,6 +25,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate, UNUser
         window = UIWindow() // uiwindow to change root view controller //must crete UIWindow if you dont use storyboard
         //set tabbar controller to rootcontroller
         window?.rootViewController = MainTabBarController()
+        window?.makeKeyAndVisible() //need this line after deleted main story board 
         
         //to enable push notifications, go to xcodeproj, capabilities, enable push
         attemptRegisterForNotifications(application: application)

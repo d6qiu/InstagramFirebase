@@ -96,7 +96,7 @@ class SharePhotoController: UIViewController {
         guard let uid = Auth.auth().currentUser?.uid else {return}
         
         let userPostRef = Database.database().reference().child("posts").child(uid)
-        let ref = userPostRef.childByAutoId() //new child location
+        let ref = userPostRef.childByAutoId() //new child location for unique post identifier
         
         let values = ["imageUrl": imageUrl, "caption": caption, "imageWidth": postImage.size.width, "imageHeight": postImage.size.height, "creationDate": Date().timeIntervalSince1970] as [String : Any] //need the cast if heterogenous dictionary
         ref.updateChildValues(values) { (err, ref) in

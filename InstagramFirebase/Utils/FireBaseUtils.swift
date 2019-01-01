@@ -16,6 +16,7 @@ extension Database {
         //observeSingleEvent means stop listening after one event, which means only does/retriece initial data from database, observe() does initial data and later changes.
         //uses dictionary to construct database, cast retrieved value back to dictionary
         //event triggered handler block called when at first retrive persisted data on firebase
+        //The listener receives a FIRDataSnapshot that contains the data at the specified location in the database at the time of the event in its VALUE property.
         Database.database().reference().child("users").child(uid).observeSingleEvent(of: .value, with: { (snapshot) in
             guard let userDictionary = snapshot.value as? [String: Any] else {return}
             let user = User(uid: uid, dictionary: userDictionary)

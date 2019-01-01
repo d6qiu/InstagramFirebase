@@ -61,7 +61,7 @@ class UserProfileHeader: UICollectionViewCell{
         
         if editProfileFollowButton.titleLabel?.text == "Unfollow" {
             //removeValue will remove the current child
-            Database.database().reference().child("following").child(currentLoggedInUserId).child(userId).removeValue { (err, ref) in
+            Database.database().reference().child("following").child(currentLoggedInUserId).child(userId).removeValue { (err, ref) in //remove value removes caller ie child(userid)
                 if let err = err {
                     print("failed to unfollow person", err)
                     return

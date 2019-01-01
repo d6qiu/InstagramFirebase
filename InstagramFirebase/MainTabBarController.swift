@@ -31,21 +31,23 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate {
         super.viewDidLoad()
         
         //before self.delegate is nill
-        self.delegate = self 
+        //weak var weakself = self
+        self.delegate = self
         //after self.delegate is self
         if Auth.auth().currentUser == nil { //means user not loged in
-            //must wait for MainTabBarController to be setted up (setUpViewControllers will go first)in the UI, so use main.async to let main thread continue running, executing this task later by wait for everything in main thread to be done, else black screen
-            DispatchQueue.main.async {
+            //must wait for MainTabBarController to be setted up (setUpViewControllers (outlets) need to go first)in the UI, so use main.async to let main thread continue running, executing this task later by wait for everything in main thread to be done, else black screen
+           DispatchQueue.main.async {
                 let loginController = LoginController()
-                let navController = UINavigationController(rootViewController: loginController) // navController lives inside scope of async // the rootviewcontroller can not be a tabbar controller //login controller  now has a navigation controller that can be accessed in its class
+                let navController = UINavigationController(rootViewController: loginController) // navController lives inside scope of async // the rootviewcontroller of navcon can not be a tabbar controller //login controller  now has a navigation controller that can be accessed in its class
                 //print(Thread.current)
                 //print(Thread.isMainThread)
                 self.present(navController, animated: true, completion: nil) //this is in main thread originally as well
                 return
-            }
+           }
             
         }
-        setUpViewControllers()
+            setUpViewControllers()
+        
     }
     //this is in main thread as well
     func setUpViewControllers() {
@@ -75,11 +77,11 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate {
         guard let items = tabBar.items else {return}
         
         for item in items {
-            item.imageInsets = UIEdgeInsets(top: 4, left: 0, bottom: -4, right: 0) //positive values cause inset/shrunk, also move it down 4, negative values outset/expand
+            item.imageInsets = UIEdgeInsets(top: 4, left: 0, bottom: -4, right: 0) //positive values cause inset/shrunk by move it down 4, negative values outset/expand
         }
     }
     
-    fileprivate func templateNavController(unselectedImage: UIImage, selectedImage: UIImage, rootViewController: UIViewController = UIViewController()) -> UINavigationController { //gives a default rootViewController if nil parameter when call this function
+    fileprivate func templateNavController(unselectedImage: UIImage, selectedImage: UIImage, rootViewController: UIViewController = UIViewController()) -> UINavigationController { //gives a default generatic viewcontroller for rootViewController if nil parameter when call this function
         let viewController = rootViewController
         let navController = UINavigationController(rootViewController: viewController)
         

@@ -22,6 +22,7 @@ class PreviewPhotoContainerView: UIView {
         return button
     }()
     
+    
     let saveButton: UIButton = {
         let button = UIButton(type: .system)
         button.setImage(UIImage(named: "save_shadow")?.withRenderingMode(.alwaysOriginal), for: .normal)
@@ -29,7 +30,11 @@ class PreviewPhotoContainerView: UIView {
         return button
     }()
     
+    
     @objc func handleSave() {
+        //closure is a nameless function that can be referenced by a strong pointer like below, but now thing is a strong pointer that points to self but will disappear when function is over, self dont have a pointer to thing, if thing is a instance var then will create memeory cycle
+        //let thing = {self.saveButton.showsTouchWhenHighlighted = false}
+        
         guard let previewImage = previewImageView.image else {return}
         let library = PHPhotoLibrary.shared()
         library.performChanges({

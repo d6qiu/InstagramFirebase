@@ -36,7 +36,6 @@
 		E4CD7A4321A095EE008F6636 /* CommentsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4CD7A4221A095EE008F6636 /* CommentsController.swift */; };
 		E4E099D7216AB60900EE8735 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E099D6216AB60900EE8735 /* AppDelegate.swift */; };
 		E4E099D9216AB60900EE8735 /* SignUpController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E099D8216AB60900EE8735 /* SignUpController.swift */; };
-		E4E099DC216AB60900EE8735 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E4E099DA216AB60900EE8735 /* Main.storyboard */; };
 		E4E099DE216AB60E00EE8735 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E4E099DD216AB60E00EE8735 /* Assets.xcassets */; };
 		E4E099E1216AB60E00EE8735 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E4E099DF216AB60E00EE8735 /* LaunchScreen.storyboard */; };
 		E4E5BBF4218418BD0092184F /* PhotoSelectorCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E5BBF3218418BD0092184F /* PhotoSelectorCell.swift */; };
@@ -77,7 +76,6 @@
 		E4E099D3216AB60900EE8735 /* InstagramFirebase.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = InstagramFirebase.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4E099D6216AB60900EE8735 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E4E099D8216AB60900EE8735 /* SignUpController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpController.swift; sourceTree = "<group>"; };
-		E4E099DB216AB60900EE8735 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		E4E099DD216AB60E00EE8735 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E4E099E0216AB60E00EE8735 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		E4E099E2216AB60E00EE8735 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -229,7 +227,6 @@
 				E492933D216B15AF0040893E /* Utils */,
 				E4E099D6216AB60900EE8735 /* AppDelegate.swift */,
 				E40ED2CF2172ABC400D2C978 /* MainTabBarController.swift */,
-				E4E099DA216AB60900EE8735 /* Main.storyboard */,
 				E4E099DD216AB60E00EE8735 /* Assets.xcassets */,
 				E4E099DF216AB60E00EE8735 /* LaunchScreen.storyboard */,
 				E4E099E2216AB60E00EE8735 /* Info.plist */,
@@ -306,7 +303,6 @@
 				E4E099E1216AB60E00EE8735 /* LaunchScreen.storyboard in Resources */,
 				E4E099DE216AB60E00EE8735 /* Assets.xcassets in Resources */,
 				E4929343216B2DDD0040893E /* GoogleService-Info.plist in Resources */,
-				E4E099DC216AB60900EE8735 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -399,14 +395,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
-		E4E099DA216AB60900EE8735 /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				E4E099DB216AB60900EE8735 /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
 		E4E099DF216AB60E00EE8735 /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (

@@ -41,7 +41,7 @@ class SignUpController: UIViewController, UIImagePickerControllerDelegate, UINav
         plusPhotoButton.layer.borderColor = UIColor.black.cgColor //animatin color?
         plusPhotoButton.layer.borderWidth = 3
         
-        dismiss(animated: true, completion: nil)
+        dismiss(animated: true, completion: nil) //dimiss whatever was presented on top , so imagepickercontroller
     }
     
     
@@ -158,7 +158,7 @@ class SignUpController: UIViewController, UIImagePickerControllerDelegate, UINav
                         //UIApplication is class, shared returns an instance, keyWindow is the most recenet shown/visible window 
                         guard let mainTabBarController = UIApplication.shared.keyWindow?.rootViewController as? MainTabBarController else {return}
                         mainTabBarController.setUpViewControllers()
-                        self.dismiss(animated: true, completion: nil)
+                        self.dismiss(animated: true, completion: nil) //the top presented view is navcon of login controlller
                         
                     })
                     

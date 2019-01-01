@@ -27,7 +27,7 @@ class HomeController: UICollectionViewController, UICollectionViewDelegateFlowLa
         refreshControl.addTarget(self, action: #selector(handleRefresh), for: .valueChanged) //touchdragging trigger refreshcontroll and its action
         collectionView.refreshControl = refreshControl
         
-        setupNavigationItems()
+        setupNavigationItems() //outlets before load model
         
         fetchAllPosts()
     }
@@ -52,6 +52,7 @@ class HomeController: UICollectionViewController, UICollectionViewDelegateFlowLa
     fileprivate func fetchFollowingUserIds() {
         guard let uid = Auth.auth().currentUser?.uid else {return}
         Database.database().reference().child("following").child(uid).observeSingleEvent(of: .value, with: { (snapshot) in
+            //following dictionary [id: 1] //unfollow will just remove the child
             guard let userIdsDictionary = snapshot.value as? [String: Any] else {return}
             userIdsDictionary.forEach({ (key, value) in
                 Database.fetchUserWithUID(uid: key, completion: { (user) in
@@ -71,6 +72,7 @@ class HomeController: UICollectionViewController, UICollectionViewDelegateFlowLa
         guard let uid = Auth.auth().currentUser?.uid else {return}
         Database.fetchUserWithUID(uid: uid) { (user) in
             self.fetchPostsWithUser(user: user)
+            
         }
     }
     
@@ -82,12 +84,12 @@ class HomeController: UICollectionViewController, UICollectionViewDelegateFlowLa
             
             self.collectionView.refreshControl?.endRefreshing() //end the refreshing animation but only after user stopped dragging
             //snapshot.key is user id
-            guard let dictionaries = snapshot.value as? [String: Any] else {return} //snape.value is a dicionary of autoid : any
+            guard let dictionaries = snapshot.value as? [String: Any] else {return} //snape.value is a dicionary of autoid : any //auto id is id for eaach posts
             
             dictionaries.forEach({ (key, value) in
                 //print("key \(key) value \(value)")
                 
-                guard let dictionary = value as? [String: Any] else {return}
+                guard let dictionary = value as? [String: Any] else {return} //post info
                 
                 var post = Post(user: user, dictionary: dictionary)
                 post.id = key
@@ -105,12 +107,14 @@ class HomeController: UICollectionViewController, UICollectionViewDelegateFlowLa
                         return p1.creationDate.compare(p2.creationDate) == .orderedDescending //recent goes to left, bigger goes to left
                     })
                     
-                    self.collectionView.reloadData()
+                    self.collectionView.reloadData() //whenever in class model changes
                 }, withCancel: { (err) in
                     print("failed to fetch like status for posts:", err)
                 })
                 
-                
+                //DispatchQueue.main.async {
+                 //   self.collectionView.reloadData()
+                //}
             })
             
             
