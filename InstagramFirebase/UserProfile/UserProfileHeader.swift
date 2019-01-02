@@ -9,7 +9,7 @@
 import UIKit
 import Firebase
 
-protocol UserProfileHeaderDelegate {
+protocol UserProfileHeaderDelegate : AnyObject{
     func didChangeToListView()
     func didChangeToGridView()
 }
@@ -17,7 +17,7 @@ protocol UserProfileHeaderDelegate {
 
 class UserProfileHeader: UICollectionViewCell{
     
-    var delegate: UserProfileHeaderDelegate?
+    weak var delegate: UserProfileHeaderDelegate?
     
     var user: User? {
         didSet {

@@ -47,30 +47,30 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate, UNUser
     
     //send a message to all apps by firebase console cloud messaging send your first message
     //listen for user notifications while app is in foreground
-    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-        completionHandler(.alert) //notification center will define the completionhandler all you need is to input the presentation option .alert will pop the alert
-    }
+//    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+//        completionHandler(.alert) //notification center will define the completionhandler all you need is to input the presentation option .alert will pop the alert
+//    }
     
     //if user response to the notification
-    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
-        let userInfo = response.notification.request.content.userInfo
-        if let followerId = userInfo["followerId"] as? String{
-            //display userprofilecontroller
-            let userProfileController = UserProfileController(collectionViewLayout: UICollectionViewFlowLayout())
-            userProfileController.userId = followerId
-            //access main ui from appdelegate, use if let if nesting upwrapping depending on previous unwrap
-            if let mainTabBarController = window?.rootViewController as? MainTabBarController { //you dont know which controller user is at when notificaiton happen anyway
-                
-                mainTabBarController.selectedIndex = 0 //setting this var changes the selected view controller, swich to home controller, so if user is at search controller, this changes the ui to the pushed userprofilecontroller down below
-                
-                mainTabBarController.presentedViewController?.dismiss(animated: true, completion: nil) //dismiss whatever was presented so the follower's profilecontroller is not blocked by it
-                
-                if let homeNavigationController = mainTabBarController.viewControllers?.first as? UINavigationController {
-                    homeNavigationController.pushViewController(userProfileController, animated: true)
-                }
-            }
-        }
-    }
+//    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+//        let userInfo = response.notification.request.content.userInfo
+//        if let followerId = userInfo["followerId"] as? String{
+//            //display userprofilecontroller
+//            let userProfileController = UserProfileController(collectionViewLayout: UICollectionViewFlowLayout())
+//            userProfileController.userId = followerId
+//            //access main ui from appdelegate, use if let if nesting upwrapping depending on previous unwrap
+//            if let mainTabBarController = window?.rootViewController as? MainTabBarController { //you dont know which controller user is at when notificaiton happen anyway
+//
+//                mainTabBarController.selectedIndex = 0 //setting this var changes the selected view controller, swich to home controller, so if user is at search controller, this changes the ui to the pushed userprofilecontroller down below
+//
+//                mainTabBarController.presentedViewController?.dismiss(animated: true, completion: nil) //dismiss whatever was presented so the follower's profilecontroller is not blocked by it
+//
+//                if let homeNavigationController = mainTabBarController.viewControllers?.first as? UINavigationController {
+//                    homeNavigationController.pushViewController(userProfileController, animated: true)
+//                }
+//            }
+//        }
+//    }
     
     
     //lexical scope, the block of which the variable/function is declared

@@ -8,14 +8,14 @@
 
 import UIKit
 
-protocol CommentInputAccessoryViewDelegate {
+protocol CommentInputAccessoryViewDelegate : AnyObject {
     func didSubmit(for comment: String)
 }
 
 
 class CommentInputAccessoryView: UIView  {
     
-    var delegate: CommentInputAccessoryViewDelegate?
+    weak var delegate: CommentInputAccessoryViewDelegate?
     
     func clearCommentTextField() {
         //commentTextView.text = nil

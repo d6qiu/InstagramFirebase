@@ -87,11 +87,11 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
             guard let user = self.user else {return}
             
             //snapshot here is different than the above one , snapshot is each child of the above one
-            allObjects.forEach({ (snapshot) in //for loop to iterate each element/autoid child
+            allObjects.forEach({ [weak self](snapshot) in //for loop to iterate each element/autoid child
                 guard let dictionary = snapshot.value as? [String: Any] else {return}
                 var post = Post(user: user, dictionary: dictionary)
                 post.id = snapshot.key //snapshot.key is autoid for each post, snapshot value is a dictioanrhy of attributes posts
-                self.posts.append(post)
+                self?.posts.append(post)
             })
 
             self.collectionView.reloadData()
@@ -107,17 +107,17 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
         //observe data added in order unlike observeSingleEvent
         //if data event type is .value, then snapshot is current database being referenced, if .childadded, then snapshot is its child
         //child -> auto id 's value is dictionary has key creationDate, child key is just key of the dictionary of child
-        ref.queryOrdered(byChild: "creationDate").observe(.childAdded, with: { (snapshot) in //snapshot return the value of the child, the block is executed for each child in this database, if .value then block executed once and snapshot return value of this database
+        ref.queryOrdered(byChild: "creationDate").observe(.childAdded, with: { [weak self](snapshot) in //snapshot return the value of the child, the block is executed for each child in this database, if .value then block executed once and snapshot return value of this database
             
             guard let dictionary = snapshot.value as? [String: Any] else {return} //as will prompt error because might fail
             
-            guard let user = self.user else {return}
+            guard let user = self?.user else {return}
             let post = Post(user: user, dictionary: dictionary)
             
             //put the newest post on first index 
-            self.posts.insert(post, at: 0) //array .insert will insert at index, to the left of already exist element and push everything back
+            self?.posts.insert(post, at: 0) //array .insert will insert at index, to the left of already exist element and push everything back
             
-            self.collectionView.reloadData()
+            self?.collectionView.reloadData()
             
         }) { (err) in
             print("failed to get snapshot of ordered post just shared data", err)
@@ -250,14 +250,14 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
         
         //guard let uid = Auth.auth().currentUser?.uid else {return}
         
-        Database.fetchUserWithUID(uid: uid) { (user) in
-            self.user = user
+        Database.fetchUserWithUID(uid: uid) { [weak self] (user) in
+            self?.user = user
             
-            self.navigationItem.title = self.user?.username
+            self?.navigationItem.title = self?.user?.username
             
-            self.collectionView.reloadData() //just reload data when observe event //triggers all the datasource and delegate methods
+            self?.collectionView.reloadData() //just reload data when observe event //triggers all the datasource and delegate methods
             
-            self.paginatePosts()
+            self?.paginatePosts()
             //self.fetchOrderPosts() //.observe(.childAdded will observe future posts being uploaded to database
         }
         

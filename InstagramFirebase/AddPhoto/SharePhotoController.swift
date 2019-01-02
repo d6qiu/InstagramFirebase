@@ -71,16 +71,16 @@ class SharePhotoController: UIViewController {
                 print("failed to upload share image", err)
                 return
             }
-            storageRef.downloadURL(completion: { (downloadURL, err) in
+            storageRef.downloadURL(completion: { [weak self](downloadURL, err) in
                 if let err = err {
-                    self.navigationItem.rightBarButtonItem?.isEnabled = true
+                    self?.navigationItem.rightBarButtonItem?.isEnabled = true
                     print("failed to get downloadurl when sharing", err)
                     return
                 }
                 guard let imageUrl = downloadURL?.absoluteString else {return}
                 print("succesfully upload share image ")
                 
-                self.saveToDatabaseWithImageUrl(imageUrl: imageUrl)
+                self?.saveToDatabaseWithImageUrl(imageUrl: imageUrl)
                 
             })
         }
@@ -99,15 +99,15 @@ class SharePhotoController: UIViewController {
         let ref = userPostRef.childByAutoId() //new child location for unique post identifier
         
         let values = ["imageUrl": imageUrl, "caption": caption, "imageWidth": postImage.size.width, "imageHeight": postImage.size.height, "creationDate": Date().timeIntervalSince1970] as [String : Any] //need the cast if heterogenous dictionary
-        ref.updateChildValues(values) { (err, ref) in
+        ref.updateChildValues(values) { [weak self](err, ref) in
             if let err = err {
-                self.navigationItem.rightBarButtonItem?.isEnabled = true
+                self?.navigationItem.rightBarButtonItem?.isEnabled = true
                 print("failed to save post to DB", err)
                 return
             }
             print("succesfully saved post to DB")
             
-            self.dismiss(animated: true, completion: nil) //dismiss will dismiss whatever was presented, i.e the photoselectorcontroller' navigation controller presented in maintabbarcontroller 
+            self?.dismiss(animated: true, completion: nil) //dismiss will dismiss whatever was presented, i.e the photoselectorcontroller' navigation controller presented in maintabbarcontroller
             
             //notifies entire application to updatefeed, catch notification in homecontroller viewdidload
             NotificationCenter.default.post(name: SharePhotoController.updateFeedNotificationName, object: nil)

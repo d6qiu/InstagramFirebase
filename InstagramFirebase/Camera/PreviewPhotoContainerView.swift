@@ -47,7 +47,7 @@ class PreviewPhotoContainerView: UIView {
             }
             
             print("successfully saved image to library")
-            DispatchQueue.main.async { //whenever some ui elements lagging, try use main thread
+            DispatchQueue.main.async { [weak self] in//whenever some ui elements lagging, try use main thread
                 let savedLabel = UILabel()
                 savedLabel.text = "Saved Successfully"
                 savedLabel.font = UIFont.boldSystemFont(ofSize: 18)
@@ -57,8 +57,8 @@ class PreviewPhotoContainerView: UIView {
                 savedLabel.backgroundColor = UIColor(white: 0, alpha: 0.3)
                 //using frame to animate ui elements in and out of the view
                 savedLabel.frame = CGRect(x: 0, y: 0, width: 150, height: 80)
-                savedLabel.center = self.center
-                self.addSubview(savedLabel)
+                savedLabel.center = (self?.center)!
+                self?.addSubview(savedLabel)
                 
                 savedLabel.layer.transform = CATransform3DMakeScale(0, 0, 0) //whenever animation, think layer, instant transfromation
                 

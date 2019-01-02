@@ -36,12 +36,12 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate {
         //after self.delegate is self
         if Auth.auth().currentUser == nil { //means user not loged in
             //must wait for MainTabBarController to be setted up (setUpViewControllers (outlets) need to go first)in the UI, so use main.async to let main thread continue running, executing this task later by wait for everything in main thread to be done, else black screen
-           DispatchQueue.main.async {
+           DispatchQueue.main.async { [weak self] in
                 let loginController = LoginController()
                 let navController = UINavigationController(rootViewController: loginController) // navController lives inside scope of async // the rootviewcontroller of navcon can not be a tabbar controller //login controller  now has a navigation controller that can be accessed in its class
                 //print(Thread.current)
                 //print(Thread.isMainThread)
-                self.present(navController, animated: true, completion: nil) //this is in main thread originally as well
+            self?.present(navController, animated: true, completion: nil) //this is in main thread originally as well
                 return
            }
             

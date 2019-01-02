@@ -59,19 +59,19 @@ class PhotoSelectorController: UICollectionViewController, UICollectionViewDeleg
                 let targetSize = CGSize(width: 200, height: 200)
                 let options = PHImageRequestOptions()
                 options.isSynchronous = true //wait til image data is ready before calling resulthandler block, calls handler exactly once, if false,  may call more than once.
-                imageManager.requestImage(for: asset, targetSize: targetSize, contentMode: .aspectFit, options: options, resultHandler: { (image, info) in
+                imageManager.requestImage(for: asset, targetSize: targetSize, contentMode: .aspectFit, options: options, resultHandler: { [weak self] (image, info) in
                     if let image = image {
-                        self.images.append(image)
-                        self.assets.append(asset)
+                        self?.images.append(image)
+                        self?.assets.append(asset)
                         //image.size.width/height in sitll the same as original. it is logical maintains ratio target size 
-                        if self.selectedImage == nil {
-                            self.selectedImage = image //set the default selectedImage
+                        if self?.selectedImage == nil {
+                            self?.selectedImage = image //set the default selectedImage
                         }
                     }
                     
                     if count == allPhotos.count - 1 {
-                        DispatchQueue.main.async { //instantly reloads background on the UI using main thread
-                            self.collectionView.reloadData() //reloaddata when data changes, retrieved
+                        DispatchQueue.main.async { [weak self] in//instantly reloads background on the UI using main thread
+                            self?.collectionView.reloadData() //reloaddata when data changes, retrieved
             
                         }
                     }

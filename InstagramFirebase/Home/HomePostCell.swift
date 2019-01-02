@@ -8,7 +8,7 @@
 
 import UIKit
 
-protocol HomePostCellDelegate {
+protocol HomePostCellDelegate : AnyObject {
     func didTapComment(post: Post)
     func didLike(for cell: HomePostCell)
 }
@@ -17,7 +17,7 @@ protocol HomePostCellDelegate {
 class HomePostCell: UICollectionViewCell {
     
     //delegate allows to get reference of desired classes without creating a new instantiaiton to that class
-    var delegate: HomePostCellDelegate
+    weak var delegate: HomePostCellDelegate?
     
     var post: Post? {
         didSet {

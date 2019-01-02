@@ -35,11 +35,11 @@ class CommentsController: UICollectionViewController, UICollectionViewDelegateFl
             
             guard let uid = dictionary["uid"] as? String else {return}
             
-            Database.fetchUserWithUID(uid: uid, completion: { (user) in
+            Database.fetchUserWithUID(uid: uid, completion: { [weak self] (user) in
                 let comment = Comment(user: user, dictionary: dictionary)
                 
-                self.comments.append(comment)
-                self.collectionView.reloadData()
+                self?.comments.append(comment)
+                self?.collectionView.reloadData()
             })
             
             
@@ -112,14 +112,14 @@ class CommentsController: UICollectionViewController, UICollectionViewDelegateFl
         guard let uid = Auth.auth().currentUser?.uid else {return}
         let postId = post?.id ?? ""
         let values = ["text": comment, "creationDate": Date().timeIntervalSince1970, "uid": uid] as [String: Any]
-        Database.database().reference().child("comments").child(postId).childByAutoId().updateChildValues(values) { (err, ref) in
+        Database.database().reference().child("comments").child(postId).childByAutoId().updateChildValues(values) { [weak self](err, ref) in
             if let err = err {
                 print("failed to insert comment", err)
                 return
             }
             print("succesfully inserted comment")
             
-            self.containerView.clearCommentTextField()
+            self?.containerView.clearCommentTextField()
         }
         
         

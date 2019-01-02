@@ -18,12 +18,12 @@ class HomeController: UICollectionViewController, UICollectionViewDelegateFlowLa
         //add notification observer to observe for notificaition name updatefeedm, self.handupdatefeed when observed 
         NotificationCenter.default.addObserver(self, selector: #selector(handleUpdateFeed), name: SharePhotoController.updateFeedNotificationName, object: nil)
         
-        
         collectionView.backgroundColor = .white
         
         collectionView.register(HomePostCell.self, forCellWithReuseIdentifier: cellId)
         
         let refreshControl = UIRefreshControl()
+        //addd target will not retain the target
         refreshControl.addTarget(self, action: #selector(handleRefresh), for: .valueChanged) //touchdragging trigger refreshcontroll and its action
         collectionView.refreshControl = refreshControl
         
@@ -55,8 +55,9 @@ class HomeController: UICollectionViewController, UICollectionViewDelegateFlowLa
             //following dictionary [id: 1] //unfollow will just remove the child
             guard let userIdsDictionary = snapshot.value as? [String: Any] else {return}
             userIdsDictionary.forEach({ (key, value) in
-                Database.fetchUserWithUID(uid: key, completion: { (user) in
-                    self.fetchPostsWithUser(user: user)
+                //fetchuserwithuid takes escaping closure and this closure points to self so makes database strong reference to self increase ref count
+                Database.fetchUserWithUID(uid: key, completion: { [weak self] (user) in
+                    self?.fetchPostsWithUser(user: user)
                 })
             })
         }) { (err) in
@@ -70,8 +71,8 @@ class HomeController: UICollectionViewController, UICollectionViewDelegateFlowLa
     var posts = [Post]()
     fileprivate func fetchPosts() { //calls static method to fetch user profile and define completion handler to fetch user posts
         guard let uid = Auth.auth().currentUser?.uid else {return}
-        Database.fetchUserWithUID(uid: uid) { (user) in
-            self.fetchPostsWithUser(user: user)
+        Database.fetchUserWithUID(uid: uid) { [weak self](user) in
+            self?.fetchPostsWithUser(user: user)
             
         }
     }
@@ -80,9 +81,9 @@ class HomeController: UICollectionViewController, UICollectionViewDelegateFlowLa
 
         let ref = Database.database().reference().child("posts").child(user.uid) //fetching post with the corresponding user and not the current user
         //if data event type is .value, then snapshot is value of ref/current database
-        ref.observeSingleEvent(of: .value, with: { (snapshot) in //snapshot is the child(user.uid) itself. snapshot.key is userid
+        ref.observeSingleEvent(of: .value, with: { [weak self](snapshot) in //snapshot is the child(user.uid) itself. snapshot.key is userid
             
-            self.collectionView.refreshControl?.endRefreshing() //end the refreshing animation but only after user stopped dragging
+            self?.collectionView.refreshControl?.endRefreshing() //end the refreshing animation but only after user stopped dragging
             //snapshot.key is user id
             guard let dictionaries = snapshot.value as? [String: Any] else {return} //snape.value is a dicionary of autoid : any //auto id is id for eaach posts
             
@@ -95,26 +96,23 @@ class HomeController: UICollectionViewController, UICollectionViewDelegateFlowLa
                 post.id = key
                 
                 guard let uid = Auth.auth().currentUser?.uid else {return} //uid is the key of dictionary of child(postid) value
-                Database.database().reference().child("likes").child(key).child(uid).observeSingleEvent(of: .value, with: { (snapshot) in
+                Database.database().reference().child("likes").child(key).child(uid).observeSingleEvent(of: .value, with: { [weak self](snapshot) in
                     if let value = snapshot.value as? Int, value == 1 {
                         post.hasLiked = true
                     } else {
                         post.hasLiked = false
                     }
-                    self.posts.append(post)
+                    self?.posts.append(post)
                     
-                    self.posts.sort(by: { (p1, p2) -> Bool in
+                    self?.posts.sort(by: { (p1, p2) -> Bool in
                         return p1.creationDate.compare(p2.creationDate) == .orderedDescending //recent goes to left, bigger goes to left
                     })
                     
-                    self.collectionView.reloadData() //whenever in class model changes
+                    self?.collectionView.reloadData() //whenever in class model changes
                 }, withCancel: { (err) in
                     print("failed to fetch like status for posts:", err)
                 })
-                
-                //DispatchQueue.main.async {
-                 //   self.collectionView.reloadData()
-                //}
+            
             })
             
             
@@ -174,7 +172,7 @@ class HomeController: UICollectionViewController, UICollectionViewDelegateFlowLa
         guard let uid = Auth.auth().currentUser?.uid else {return}
         let values = [uid: post.hasLiked == true ? 0 : 1]
         //need child(postId) so when fetch likes you know which post to for
-        Database.database().reference().child("likes").child(postId).updateChildValues(values) { (err, ref) in
+        Database.database().reference().child("likes").child(postId).updateChildValues(values) { [weak self](err, ref) in
             if let err = err {
                 print("failed to like post ", err )
                 return
@@ -184,8 +182,8 @@ class HomeController: UICollectionViewController, UICollectionViewDelegateFlowLa
             
             post.hasLiked = !post.hasLiked
             
-            self.posts[indexPath.item] = post //since struct is value type, the line above var post = posts[indexPath.item] //gets a copy of struct post since struct is value type
-            self.collectionView.reloadItems(at: [indexPath])
+            self?.posts[indexPath.item] = post //since struct is value type, the line above var post = posts[indexPath.item] //gets a copy of struct post since struct is value type
+            self?.collectionView.reloadItems(at: [indexPath])
         }
         
     }
