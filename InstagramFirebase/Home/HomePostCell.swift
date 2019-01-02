@@ -17,7 +17,7 @@ protocol HomePostCellDelegate {
 class HomePostCell: UICollectionViewCell {
     
     //delegate allows to get reference of desired classes without creating a new instantiaiton to that class
-    var delegate: HomePostCellDelegate
+    var delegate: HomePostCellDelegate?
     
     var post: Post? {
         didSet {
