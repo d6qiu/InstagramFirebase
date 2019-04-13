@@ -72,7 +72,7 @@ class UserProfileHeader: UICollectionViewCell{
             }
             
             
-        } else {
+        } else if editProfileFollowButton.titleLabel?.text == "Follow" {
             let ref = Database.database().reference().child("following").child(currentLoggedInUserId)
             let values = [userId: 1]
             //update current child's values
@@ -150,13 +150,12 @@ class UserProfileHeader: UICollectionViewCell{
     let postLabel: UILabel = {
        let label = UILabel()
         //NSAtttributedString is the string, .key are the attributes
-        let attributedText = NSMutableAttributedString(string: "11\n", attributes: [NSAttributedString.Key.font : UIFont.boldSystemFont(ofSize: 14)])
+        let attributedText = NSMutableAttributedString(string: "0\n", attributes: [NSAttributedString.Key.font : UIFont.boldSystemFont(ofSize: 14)])
         
         attributedText.append(NSAttributedString(string: "posts", attributes: [NSAttributedString.Key.foregroundColor: UIColor.lightGray, NSAttributedString.Key.font
             : UIFont.systemFont(ofSize: 14)]))
         
         label.attributedText = attributedText
-        
         label.numberOfLines = 0 //use as many line as needed to display label's text
         label.textAlignment = .center
         return label

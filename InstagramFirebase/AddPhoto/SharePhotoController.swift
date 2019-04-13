@@ -86,6 +86,7 @@ class SharePhotoController: UIViewController {
         }
     }
     
+    //so observer in another class can enter this as their notification name parameter
     static let updateFeedNotificationName = NSNotification.Name(rawValue: "UpdateFeed")
 
     
@@ -107,7 +108,7 @@ class SharePhotoController: UIViewController {
             }
             print("succesfully saved post to DB")
             
-            self.dismiss(animated: true, completion: nil) //dismiss will dismiss whatever was presented, i.e the photoselectorcontroller' navigation controller presented in maintabbarcontroller 
+            self.dismiss(animated: true, completion: nil) //dismiss will dismiss whatever was presented, i.e the photoselectorcontroller' navigation controller presented in maintabbarcontroller， dismiss that will return to whatever controller user was viewing.
             
             //notifies entire application to updatefeed, catch notification in homecontroller viewdidload
             NotificationCenter.default.post(name: SharePhotoController.updateFeedNotificationName, object: nil)

@@ -14,7 +14,7 @@ class UserSearchController: UICollectionViewController, UICollectionViewDelegate
     lazy var searchBar: UISearchBar = { //lazy var instead of let is required because self/usersearchcontroller must be instantiated before variable is defined, else err: Cannot assign value of type '(UserSearchController) -> () -> (UserSearchController)' to type 'UISearchBarDelegate?' when set sb.delegate = self
         let sb = UISearchBar()
         sb.placeholder = "Enter username"
-        sb.barTintColor = .gray
+        sb.barTintColor = .gray //deosnt do anything
         UITextField.appearance(whenContainedInInstancesOf: [UISearchBar.self]).backgroundColor = UIColor.rgb(red: 230, green: 230, blue: 230) //get the textfeild contained in this class
         
         sb.delegate = self //make sure self exist before accessing it by making searchbar a lazy vairable
@@ -46,12 +46,13 @@ class UserSearchController: UICollectionViewController, UICollectionViewDelegate
         
         let navBar = navigationController?.navigationBar
         
+        //anchor searchbar in the navBar
         searchBar.anchor(top: navBar?.topAnchor, left: navBar?.leftAnchor, bottom: navBar?.bottomAnchor, right: navBar?.rightAnchor, paddingTop: 0, paddingLeft: 8, paddingBottom: 0, paddingRight: -8, width: 0, height: 0)
         
         collectionView.register(UserSearchCell.self, forCellWithReuseIdentifier: cellId)
         
         collectionView.alwaysBounceVertical = true //bounces when scroll down or up even not enough cells to exceed screen space
-        collectionView.keyboardDismissMode = .onDrag //keyboard dismiss whenever drag on view 
+        collectionView.keyboardDismissMode = .onDrag //keyboard dismiss whenever drag on view
         
         fetchUsers()
     }
@@ -80,7 +81,7 @@ class UserSearchController: UICollectionViewController, UICollectionViewDelegate
     
     
     var filteredUsers = [User]()
-    var users = [User]()
+    var users = [User]() //wihtout self user
     
     
     fileprivate func fetchUsers() {

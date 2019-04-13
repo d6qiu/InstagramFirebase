@@ -21,7 +21,7 @@ extension Database {
             guard let userDictionary = snapshot.value as? [String: Any] else {return}
             let user = User(uid: uid, dictionary: userDictionary)
             
-            completion(user)
+            completion(user) //inputs are defined by the caller, closure body is defined by the maker
             
         }) { (err) in
             print("Failed to fetch user for posts ")

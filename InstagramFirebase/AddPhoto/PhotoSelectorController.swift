@@ -21,8 +21,21 @@ class PhotoSelectorController: UICollectionViewController, UICollectionViewDeleg
         collectionView.register(PhotoSelectorCell.self, forCellWithReuseIdentifier: cellId)
         collectionView.register(PhotoSelectorHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: headerId)
         
-        fetchPhotos()
+        let photos = PHPhotoLibrary.authorizationStatus()
+        if photos == .notDetermined {
+            //requestauthorization pops up the asking permission controller, need to edit property list for the controller to pop up. 
+            PHPhotoLibrary.requestAuthorization { [weak self](status) in
+                if status == .authorized {
+                    self?.fetchPhotos()
+                }
+            }
+        } else {
+            fetchPhotos()
+        }
+        //fetchPhotos()
     }
+    
+    
     
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         selectedImage = images[indexPath.item]
@@ -46,6 +59,8 @@ class PhotoSelectorController: UICollectionViewController, UICollectionViewDeleg
         return fetchOptions
     }
     
+    
+    
     fileprivate func fetchPhotos() {
       
         let allPhotos = PHAsset.fetchAssets(with: .image, options: assetsFetchOptions())
@@ -56,14 +71,14 @@ class PhotoSelectorController: UICollectionViewController, UICollectionViewDeleg
                 //print(asset) //PHAsset contains all sorts of infor about one image, has variable creationDate
                 
                 let imageManager = PHImageManager.default()
-                let targetSize = CGSize(width: 200, height: 200)
+                let targetSize = CGSize(width: 200, height: 200) //taget size only affects resolution
                 let options = PHImageRequestOptions()
                 options.isSynchronous = true //wait til image data is ready before calling resulthandler block, calls handler exactly once, if false,  may call more than once.
                 imageManager.requestImage(for: asset, targetSize: targetSize, contentMode: .aspectFit, options: options, resultHandler: { (image, info) in
                     if let image = image {
                         self.images.append(image)
                         self.assets.append(asset)
-                        //image.size.width/height in sitll the same as original. it is logical maintains ratio target size 
+                        //image.size.width/height in sitll the same as original not target size?. it is logical maintains ratio target size
                         if self.selectedImage == nil {
                             self.selectedImage = image //set the default selectedImage
                         }

@@ -24,6 +24,7 @@ class SignUpController: UIViewController, UIImagePickerControllerDelegate, UINav
         let imagePickerController = UIImagePickerController()
         imagePickerController.delegate = self //imagepickercontroll's delegate is type uiimagepcikercontrollerdelegate && uinavigationcontrollerdelegate, set delegate = self means it needs a reference of self object
         imagePickerController.allowsEditing = true
+        //imagePickerController.sourceType defaulf is photo library
         present(imagePickerController, animated: true, completion: nil)
     }
     //MARK: - imagePickercontroller delegate methods
@@ -37,7 +38,7 @@ class SignUpController: UIViewController, UIImagePickerControllerDelegate, UINav
         }
         
         plusPhotoButton.layer.cornerRadius = plusPhotoButton.frame.size.width/2 //sets the radius
-        plusPhotoButton.layer.masksToBounds = true //clips the mask to match the bounds
+        plusPhotoButton.layer.masksToBounds = true //clips the mask to match the bounds do this when UIbutton has image
         plusPhotoButton.layer.borderColor = UIColor.black.cgColor //animatin color?
         plusPhotoButton.layer.borderWidth = 3
         
@@ -126,7 +127,7 @@ class SignUpController: UIViewController, UIImagePickerControllerDelegate, UINav
             //we assign each user to a random string as key
             let storageRef = Storage.storage().reference().child("profile_images").child(fileName)
             
-            storageRef.putData(uploadData, metadata: nil, completion: { (metaData, err) in
+            storageRef.putData(uploadData, metadata: nil, completion: { (metaData, err) in //data is just data, has no name, needs a name for it tobe download
                 if let err = err {
                     print("failed to uploard profile image: ", err)
                     return
@@ -145,9 +146,9 @@ class SignUpController: UIViewController, UIImagePickerControllerDelegate, UINav
                     guard let fcmToken = Messaging.messaging().fcmToken else {return}
                     
                     let dictionaryValues = ["username": username, "profileImageUrl": profileImageUrl, "fcmToken": fcmToken]
-                    let values = [uid: dictionaryValues]
+                    let values = [uid: dictionaryValues] //dictionary, array of pairs
                     
-                    //.setValue replace child node //append dictionary //key uid became child, child database has/contains a dictionary
+                    //.setValue replace child node //updatechildvalues append dictionary //key uid became child, child database has/contains a dictionary
                     Database.database().reference().child("users").updateChildValues(values, withCompletionBlock: { (err, ref) in //updatechildvalues is just update this node's values
                             if let err = err {
                                 print("failed to save user info into db", err)
@@ -158,9 +159,10 @@ class SignUpController: UIViewController, UIImagePickerControllerDelegate, UINav
                         //UIApplication is class, shared returns an instance, keyWindow is the most recenet shown/visible window 
                         guard let mainTabBarController = UIApplication.shared.keyWindow?.rootViewController as? MainTabBarController else {return}
                         mainTabBarController.setUpViewControllers()
-                        self.dismiss(animated: true, completion: nil) //the top presented view is navcon of login controlller
+                        self.dismiss(animated: true, completion: nil) //the top presented view is navcon of login controlller, signupcontroller is pushed remember? dimiss will dimiss the top most presented view which is the navcon
                         
                     })
+                    
                     
                 })
                 
@@ -192,7 +194,7 @@ class SignUpController: UIViewController, UIImagePickerControllerDelegate, UINav
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        self.hideKeyboardWhenTappedAround()
         view.addSubview(alreadyHaveAccountButton)
         alreadyHaveAccountButton.anchor(top: nil, left: view.leftAnchor, bottom: view.bottomAnchor, right: view.rightAnchor, paddingTop: 0, paddingLeft: 0, paddingBottom: 0, paddingRight: 0, width: 0, height: 50)
         
@@ -202,7 +204,7 @@ class SignUpController: UIViewController, UIImagePickerControllerDelegate, UINav
         plusPhotoButton.anchor(top: view.topAnchor, left: nil, bottom: nil, right: nil, paddingTop: 40, paddingLeft: 0, paddingBottom: 0, paddingRight: 0, width: 140, height: 140)
         plusPhotoButton.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
         
-        view.addSubview(emailTextField)
+        //view.addSubview(emailTextField)
         
         setUpInputFields()
         

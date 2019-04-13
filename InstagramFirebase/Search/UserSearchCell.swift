@@ -41,7 +41,7 @@ class UserSearchCell: UICollectionViewCell {
         addSubview(profileImageView)
         addSubview(usernameLabel)
         
-        profileImageView.anchor(top: nil, left: leftAnchor, bottom: nil, right: nil, paddingTop: 0, paddingLeft: 8, paddingBottom: 0, paddingRight: 0, width: 50, height: 50)
+        profileImageView.anchor(top: nil, left: leftAnchor, bottom: nil, right: nil, paddingTop: 0, paddingLeft: 8, paddingBottom: 0, paddingRight: 0, width: 50, height: 50) //these dimenesion determines sizeforitemat for usersearchcontroller 
         profileImageView.centerYAnchor.constraint(equalTo: self.centerYAnchor).isActive = true //needs to set y axis since .anchor only setted x axis
         profileImageView.layer.cornerRadius = 50 / 2
         

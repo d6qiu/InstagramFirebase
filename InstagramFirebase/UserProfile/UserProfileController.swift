@@ -33,6 +33,8 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        //only observer ie this class can observe notificaition
+        NotificationCenter.default.addObserver(self, selector: #selector(handleUpdateFeed), name: SharePhotoController.updateFeedNotificationName, object: nil)
         //collectionView.delegate = self //collectionView.delegate is already self, maybe only controllers need to set delegate = self, UICollectionViewController simply sets itself as the delegate of the collection view it owns
         
         collectionView?.backgroundColor = .white
@@ -50,6 +52,17 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
         //fetchOrderPosts() //.observe(.childAdded will observe future posts being uploaded to database
         
     }
+    @objc func handleUpdateFeed() {
+        handleRefresh()
+    }
+    
+    @objc func handleRefresh() {
+        
+        posts.removeAll()
+        isFinishedPaging = false
+        paginatePosts()
+        //fetchAllPosts()
+    }
     
     var isFinishedPaging = false
     var posts = [Post]()
@@ -62,32 +75,34 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
         //queryOrderedbykey dont sort the keys, just goes down keys as date added to the database
         //var query = ref.queryOrderedByKey()
         //print(query)
-        var query = ref.queryOrdered(byChild: "creationDate") //sorted by the specific attribute/value of the child, child is autoid, creationDate is a key of autoid's value
-        if posts.count > 0 { //if not first round
-            let value = posts.last?.creationDate.timeIntervalSince1970
-            query = query.queryEnding(atValue: value) //query til ends at value
+        var query = ref.queryOrdered(byChild: "creationDate") //sorted by the specific attribute/value of the child, childnode is autoid, creationDate is a key of autoid's value
+        if posts.count > 0 { //if not first iteration of the query four posts at each step
+            let value = posts.last?.creationDate.timeIntervalSince1970 //posts.last is the oldest post out of the four posts. oldest, older, recent, most recent, but post array is reveresed remember? so oldest = last
+            query = query.queryEnding(atValue: value) //make query limit to less than or equal to value, which are only the posts with creation time older than value
             //query = query.queryStarting(atValue: value)
         }
         
         //queryordered base on creationDate, last 4 element ending at value
         //if first round, just last 4 on creationDate
-        query.queryLimited(toLast: 4).observeSingleEvent(of: .value, with: { (snapshot) in
+        query.queryLimited(toLast: 4).observeSingleEvent(of: .value, with: { (snapshot) in //fetch 4 posts at one time, in order of creation date
+            //snapshot.key is uid, snapshot.children is bunch of autoid/postid nodes, so allobjects = [postid : postinfodictionary] allojects is type [any], allobjects are bunch of autoid nodes
             guard var allObjects = snapshot.children.allObjects as? [DataSnapshot] else {return} //want array of snapshot children, which is just value of the snapshot
-            
+            //reverse array of snapshots of [autoid: postfo]posts that the child(uid)
             allObjects.reverse()
             
             if allObjects.count < 4 { //if less than 4 , out of elements to page
                 self.isFinishedPaging = true
             }
             
-            if self.posts.count > 0 && allObjects.count > 0 {
-                allObjects.removeFirst() //the first one of second paging is repeated
+            if self.posts.count > 0 && allObjects.count > 0 { //posts.count = 0 at first iteration
+                allObjects.removeFirst() //the first one of second paging is repeated because queryEnding(equal to value) cause the repeat
             }
             
             guard let user = self.user else {return}
             
             //snapshot here is different than the above one , snapshot is each child of the above one
             allObjects.forEach({ (snapshot) in //for loop to iterate each element/autoid child
+                //snapshot.key is post's autoid, so allObjects is arrray of [autoid: postinfoDictionary]
                 guard let dictionary = snapshot.value as? [String: Any] else {return}
                 var post = Post(user: user, dictionary: dictionary)
                 post.id = snapshot.key //snapshot.key is autoid for each post, snapshot value is a dictioanrhy of attributes posts
@@ -213,15 +228,14 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
         return 1
     }
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        
         if isGridView == true {
             let width = (view.frame.width - 2) / 3 //-2 pixels from the nextTo spacings, otherwise since 3 * cellItem will exceed view.frame.width, flowlayout will automatically put the next cell in the next row
             return CGSize(width: width, height: width)
         } else {
-            var height: CGFloat = 40 + 8 + 8 // username + padding top + imageView padding top
+            var height: CGFloat = 40 + 8 + 8 // userprofileimage.height + padding top + photoimageView padding top
             height += view.frame.width
             height += 50 //bottom context buttons
-            height += 80 //caption space
+            height += 80 //caption space, change it to whatever u want, since caption label is the lowest block of ui anchored to view's bottom anchor (the above ones are kinda fixed), change this will make caption label automatic stretch
             return CGSize(width: view.frame.width, height: height) //so imageView will be a square
         }
     }
@@ -255,7 +269,7 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
             
             self.navigationItem.title = self.user?.username
             
-            self.collectionView.reloadData() //just reload data when observe event //triggers all the datasource and delegate methods
+            //self.collectionView.reloadData() //commented this out why??? could be reason for something to break here
             
             self.paginatePosts()
             //self.fetchOrderPosts() //.observe(.childAdded will observe future posts being uploaded to database

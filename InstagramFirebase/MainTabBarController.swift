@@ -10,10 +10,38 @@ import UIKit
 import Firebase
 class MainTabBarController: UITabBarController, UITabBarControllerDelegate {
     
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        //before self.delegate is nill
+        //weak var weakself = self
+        self.delegate = self
+        //after self.delegate is self
+        if Auth.auth().currentUser == nil { //means user not loged in
+            //the below code needs to be in main async. else black screen when not logged in, maybe because tab bar controller unseen stuff not completely setted up, so needs to delay present navcontroller. 
+           DispatchQueue.main.async {
+                let loginController = LoginController()
+                let navController = UINavigationController(rootViewController: loginController) // navController lives inside scope of async // its rootviewcontroller of navcon can not be a tabbar controller //login controller  now has a navigation controller that can be accessed in its class
+                //print(Thread.current)
+                //print(Thread.isMainThread)
+                self.present(navController, animated: true, completion: nil) //this is in main thread originally as well
+                return //what's this for idk??
+          }
+        
+        
+        }
+        
+        self.setUpViewControllers()
+        
+    }
+    
+    
+    
     //The tab bar controller calls this method in response to the user tapping a tab bar item. You can use this method to dynamically decide whether a given tab should be made the active tab.
     func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
         
-        let index = viewControllers?.firstIndex(of: viewController)
+        let index = viewControllers?.firstIndex(of: viewController) //index of selected controller
         if index == 2 {
             
             let photoSelectorController = PhotoSelectorController(collectionViewLayout: UICollectionViewFlowLayout())
@@ -25,30 +53,10 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate {
         }
         
         return true //if true, switch to the selected tab
-    }
+    } //switching between tabs wont destory previous ones
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        //before self.delegate is nill
-        //weak var weakself = self
-        self.delegate = self
-        //after self.delegate is self
-        if Auth.auth().currentUser == nil { //means user not loged in
-            //must wait for MainTabBarController to be setted up (setUpViewControllers (outlets) need to go first)in the UI, so use main.async to let main thread continue running, executing this task later by wait for everything in main thread to be done, else black screen
-           DispatchQueue.main.async {
-                let loginController = LoginController()
-                let navController = UINavigationController(rootViewController: loginController) // navController lives inside scope of async // the rootviewcontroller of navcon can not be a tabbar controller //login controller  now has a navigation controller that can be accessed in its class
-                //print(Thread.current)
-                //print(Thread.isMainThread)
-                self.present(navController, animated: true, completion: nil) //this is in main thread originally as well
-                return
-           }
-            
-        }
-            setUpViewControllers()
-        
-    }
+    
+    
     //this is in main thread as well
     func setUpViewControllers() {
         
@@ -77,7 +85,9 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate {
         guard let items = tabBar.items else {return}
         
         for item in items {
+            //so top goes down by 4, bottom goes up by 4
             item.imageInsets = UIEdgeInsets(top: 4, left: 0, bottom: -4, right: 0) //positive values cause inset/shrunk by move it down 4, negative values outset/expand
+            
         }
     }
     

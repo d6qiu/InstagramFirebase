@@ -75,7 +75,7 @@ class HomePostCell: UICollectionViewCell {
     
     let optionButton: UIButton = {
        let button = UIButton(type: .system)
-        button.setTitle("•••", for: .normal)
+        button.setTitle("•••", for: .normal) //edit -> emoji -> bullet
         button.setTitleColor(.black, for: .normal)
         return button
     }()
@@ -83,7 +83,7 @@ class HomePostCell: UICollectionViewCell {
     lazy var likeButton: UIButton = {
        let button = UIButton(type: .system)
         button.setImage(UIImage(named: "like_unselected")?.withRenderingMode(.alwaysOriginal), for: .normal)
-        button.addTarget(nil, action: #selector(handleLike), for: .touchUpInside)
+        button.addTarget(self, action: #selector(handleLike), for: .touchUpInside)
         return button
     }()
     

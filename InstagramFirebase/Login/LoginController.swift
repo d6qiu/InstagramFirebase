@@ -39,6 +39,7 @@ class LoginController: UIViewController {
         return textField
     }()
     
+    
     let passwordTextField: UITextField = {
         let textField = UITextField()
         textField.placeholder = "Password"
@@ -68,6 +69,7 @@ class LoginController: UIViewController {
         button.backgroundColor = UIColor.rgb(red: 149, green: 204, blue: 244)
         button.layer.cornerRadius = 5 //changing to round border of button differ from changing UITextfield, layer is for animation
         button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 14)
+    
         button.setTitleColor(.white, for: .normal)
        
         button.addTarget(self, action: #selector(handleLogin), for: .touchUpInside)
@@ -75,6 +77,12 @@ class LoginController: UIViewController {
         button.isEnabled = false
         return button
     }()
+    
+   
+    
+    
+    
+    
     
     @objc func handleLogin() {
         guard let email = emailTextField.text else {return}
@@ -90,9 +98,9 @@ class LoginController: UIViewController {
             print("Succesfully logged back in with user: ", result?.user.uid ?? "") //use ?? to get rid warning of fail to unwrap
             
             guard let mainTabBarController = UIApplication.shared.keyWindow?.rootViewController as? MainTabBarController else {return}
-            mainTabBarController.setUpViewControllers()
+            mainTabBarController.setUpViewControllers() //refresh view controller when log in
             
-            self.dismiss(animated: true, completion: nil)
+            self.dismiss(animated: true, completion: nil) //so need to present login controller's navigation controlelr again after logged out 
             
         }
     }
@@ -106,14 +114,14 @@ class LoginController: UIViewController {
         attributedTitle.append(NSAttributedString(string: "Sign Up", attributes: [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 14), NSAttributedString.Key.foregroundColor: UIColor.rgb(red: 17, green: 154, blue: 237)]))
         
         button.setAttributedTitle(attributedTitle, for: .normal)
-        button.addTarget(nil, action: #selector(handleShowSignUp), for: .touchUpInside) //self is bascially nil at the point, if nil, The target object—that is, the object whose action method is called. If you specify nil, UIKit searches the responder chain for an object that responds to the specified action message and delivers the message to that object.
+        button.addTarget(nil, action: #selector(handleShowSignUp), for: .touchUpInside) //self is bascially nil at the point, if nil, The target object—that is, the object whose action method is called. If you specify nil, UIKit searches the responder chain for an object that responds to the specified action message and delivers the message to that object. self wont be nil when touchupinside triggered
         //print(button.allTargets) target is nil
         return button
     }()
     
     @objc func handleShowSignUp() {
         let signUpController = SignUpController()
-        navigationController?.pushViewController(signUpController, animated: true)
+        navigationController?.pushViewController(signUpController, animated: true) //login controller's navigation controller presented by maintabcontroller
     }
     
     //changes the status bar on top from black text to white
@@ -123,7 +131,7 @@ class LoginController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        self.hideKeyboardWhenTappedAround()
         view.addSubview(logoContainerView)
         logoContainerView.anchor(top: view.topAnchor, left: view.leftAnchor, bottom: nil, right: view.rightAnchor, paddingTop: 0, paddingLeft: 0, paddingBottom: 0, paddingRight: 0, width: 0, height: 150)
         
@@ -148,6 +156,6 @@ class LoginController: UIViewController {
         stackView.distribution = .fillEqually
         
         view.addSubview(stackView)
-        stackView.anchor(top: logoContainerView.bottomAnchor, left: view.leftAnchor, bottom: nil, right: view.rightAnchor, paddingTop: 40, paddingLeft: 40, paddingBottom: 0, paddingRight: -40, width: 0, height: 140) //height 40 + 40 + 40 + 10 + 10 for the spacing
+        stackView.anchor(top: logoContainerView.bottomAnchor, left: view.leftAnchor, bottom: nil, right: view.rightAnchor, paddingTop: 40, paddingLeft: 40, paddingBottom: 0, paddingRight: -40, width: 0, height: 140) //height 40 + 40 + 40 + 10 + 10 for the spacing 40 is set by .fillequally
     }
 }

@@ -13,7 +13,7 @@ import FirebaseMessaging
 
 
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate, UNUserNotificationCenterDelegate{ //UIKit dispatches events to responders like appDelegate, The UIapplication object informs the delegate of significant runtime events, something happened, tells delegate to run its methods.
+class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate, UNUserNotificationCenterDelegate{ //UIKit dispatches events to responders like appDelegate, The UIapplication object informs the delegate of significant runtime events, something happened, tells delegate to run its methods. AppDelegate is Uiapplication's delegate
 
     var window: UIWindow?
 

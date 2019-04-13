@@ -18,14 +18,16 @@ class CommentInputAccessoryView: UIView  {
     var delegate: CommentInputAccessoryViewDelegate?
     
     func clearCommentTextField() {
-        //commentTextView.text = nil
+        commentTextView.text = nil
         commentTextView.showPlaceholderLabel()
     }
     
+//    UITextField is specifically one line only.
+//    Use UITextView instead for multiline text.
     //setting var private so when debugg you know for sure it is not outside class causing the error
     fileprivate let commentTextView: CommentInputTextView = { //commentinputtextview is a custom textfield with placeholder 
         let tv = CommentInputTextView()
-        tv.isScrollEnabled = false //make textfield taller
+        tv.isScrollEnabled = false //make textView taller, problem: textfield too low way under safearea
         tv.font = UIFont.systemFont(ofSize: 18)
         
         return tv
@@ -44,7 +46,7 @@ class CommentInputAccessoryView: UIView  {
     override init(frame: CGRect) { //avoid bloating initilizers 
         super.init(frame: frame)
         //1, fix commment textfield so low
-        autoresizingMask = .flexibleHeight //caller resizes its height  base on superview/ commentsController's view bounds
+        autoresizingMask = .flexibleHeight //caller/inputaccessory view  resizes its height  base on superview/ commentsController's view bounds
         
         backgroundColor = .white
         
@@ -59,7 +61,7 @@ class CommentInputAccessoryView: UIView  {
         
     }
     //2
-    //no boundries, resize base on content
+    //..zero means no boundries, textview resize base on content
     override var intrinsicContentSize: CGSize {
         return .zero
     }
