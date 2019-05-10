@@ -40,7 +40,7 @@ class CameraController: UIViewController, AVCapturePhotoCaptureDelegate, UIViewC
     }
     
 
-    
+    //calls this after capture photo
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
         
         guard let imageData = photo.fileDataRepresentation() else {return}
@@ -66,6 +66,7 @@ class CameraController: UIViewController, AVCapturePhotoCaptureDelegate, UIViewC
     
     let customAnimationPresentor = CustomAnimationPresentor()
     let customAnimationDismisser = CustomAnimationDismisser()
+    
     //transition delegate methods //so when self gets presented or dismissed, provides custom animation for it, when self gets presented ,call this 
     func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         return customAnimationPresentor
@@ -98,6 +99,7 @@ class CameraController: UIViewController, AVCapturePhotoCaptureDelegate, UIViewC
         //set up inputs
         guard let captureDevice = AVCaptureDevice.default(for: .video) else {return} //.video includes photo
         
+        //input is which device
         do {
             let input = try AVCaptureDeviceInput(device: captureDevice)
             if captureSession.canAddInput(input) {
@@ -107,13 +109,13 @@ class CameraController: UIViewController, AVCapturePhotoCaptureDelegate, UIViewC
             print("could not set up camera input ", err)
         }
         
-        //setup output
+        //setup output, output is photo
         if captureSession.canAddOutput(output) {
             captureSession.addOutput(output)
         }
         
         //setup output preview
-        let previewLayer = AVCaptureVideoPreviewLayer(session: captureSession) //what user see before snapping
+        let previewLayer = AVCaptureVideoPreviewLayer(session: captureSession) //what user see before snapping, ie the camera view
         previewLayer.frame = view.frame
         view.layer.addSublayer(previewLayer)
         

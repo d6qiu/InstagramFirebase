@@ -23,7 +23,8 @@ class PhotoSelectorController: UICollectionViewController, UICollectionViewDeleg
         
         let photos = PHPhotoLibrary.authorizationStatus()
         if photos == .notDetermined {
-            //requestauthorization pops up the asking permission controller, need to edit property list for the controller to pop up. 
+            //requestauthorization pops up the asking permission controller, need to edit property list for the controller to pop up.
+            //this fix the bug where fetching photos goes first before asking permission controller pops up
             PHPhotoLibrary.requestAuthorization { [weak self](status) in
                 if status == .authorized {
                     self?.fetchPhotos()
@@ -42,7 +43,7 @@ class PhotoSelectorController: UICollectionViewController, UICollectionViewDeleg
         collectionView.reloadData()
         
         let indexPath = IndexPath(item: 0, section: 0) //0,0 is the first item in the collection view lay out
-        collectionView.scrollToItem(at: indexPath, at: .bottom, animated: true) //so scroll the first item to the bottom, which means scroll up to see the fullsize image
+        collectionView.scrollToItem(at: indexPath, at: .bottom, animated: true) //so scroll the first item to the bottom, which means play animation to scroll up in order to see the fullsize image
     }
     
     var selectedImage : UIImage?
@@ -125,6 +126,7 @@ class PhotoSelectorController: UICollectionViewController, UICollectionViewDeleg
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+        //create a line at top margin of cells, cells content move down by 1? think as coordination of the grid
         return UIEdgeInsets(top: 1, left: 0, bottom: 0, right: 0)
     }
     
@@ -158,7 +160,7 @@ class PhotoSelectorController: UICollectionViewController, UICollectionViewDeleg
     }
     
     fileprivate func setupNavigationButtons() {
-        navigationController?.navigationBar.tintColor = .black
+        navigationController?.navigationBar.tintColor = .black //sets color of navigation items, like cancel text color
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Cancel", style: .plain, target: self, action: #selector(handleCancel))
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Next", style: .plain, target: self, action: #selector(handleNext))
     }

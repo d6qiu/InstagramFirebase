@@ -38,7 +38,7 @@ class CustomImageView: UIImageView {
             //let response  = response as! HTTPURLResponse
             //response.statusCode
             
-            if url.absoluteString != self.lastURLUsedToLoad { //if not equal means completion method overlap with second reload
+            if url.absoluteString != self.lastURLUsedToLoad { //if not equal means completion method overlap with second time loadImage(), but second datatask not executed. you want the second url and wants get rid the first data task. so return here
                 return
             }
             
