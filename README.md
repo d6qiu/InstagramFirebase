@@ -9,3 +9,9 @@ Home page + comments:
 Search users + follow + refresh home page
 
 <img src='http://g.recordit.co/khHniL6ELJ.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+
+
+Share post + user profile 
+
+<img src='http://g.recordit.co/NnDDRjU3Iz.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+
