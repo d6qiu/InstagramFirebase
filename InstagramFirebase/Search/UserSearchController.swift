@@ -11,7 +11,7 @@ import Firebase
 
 class UserSearchController: UICollectionViewController, UICollectionViewDelegateFlowLayout, UISearchBarDelegate{
     
-    lazy var searchBar: UISearchBar = { //lazy var instead of let is required because self/usersearchcontroller must be instantiated before variable is defined, else err: Cannot assign value of type '(UserSearchController) -> () -> (UserSearchController)' to type 'UISearchBarDelegate?' when set sb.delegate = self
+    lazy var searchBar: UISearchBar = { //lazy var instead of let is required because self/usersearchcontroller must be instantiated before this variable is defined, else err: Cannot assign value of type '(UserSearchController) -> () -> (UserSearchController)' to type 'UISearchBarDelegate?' when set sb.delegate = self at line 20
         let sb = UISearchBar()
         sb.placeholder = "Enter username"
         sb.barTintColor = .gray //deosnt do anything

@@ -91,7 +91,7 @@ class HomeController: UICollectionViewController, UICollectionViewDelegateFlowLa
             
             dictionaries.forEach({ (key, value) in //for each post of this user
                 //print("key \(key) value \(value)")
-                //key is post id/name
+                //key is post id/name/autoid
                 guard let dictionary = value as? [String: Any] else {return} //post info
                 
                 var post = Post(user: user, dictionary: dictionary) //cache posts

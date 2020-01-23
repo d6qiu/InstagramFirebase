@@ -33,7 +33,7 @@ class UserProfileController: UICollectionViewController, UICollectionViewDelegat
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        //only observer ie this class can observe notificaition
+        //only observer, ie this class can observe notificaition
         NotificationCenter.default.addObserver(self, selector: #selector(handleUpdateFeed), name: SharePhotoController.updateFeedNotificationName, object: nil)
         //collectionView.delegate = self //collectionView.delegate is already self, maybe only controllers need to set delegate = self, UICollectionViewController simply sets itself as the delegate of the collection view it owns
         
