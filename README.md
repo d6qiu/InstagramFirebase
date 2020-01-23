@@ -13,5 +13,5 @@ Search users + follow + refresh home page
 
 Share post + user profile 
 
-<img src='http://g.recordit.co/NnDDRjU3Iz.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+<img src='http://g.recordit.co/y7aEFyuOKJ.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
 
